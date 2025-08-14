@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lasco/core/cubit/global_cubit.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
-import 'package:lasco/features/notification/views/notifications_screen.dart';
 
 import '../../../core/component/widgets/app_text_field.dart';
 import '../../../core/constants/app_colors.dart';
@@ -123,18 +124,18 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               SizedBox(height: 25.h),
               const WelcomeHeader(),
-              SizedBox(height: 10.h),
+              SizedBox(height: 20.h),
               _buildSearchBar(context),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                     SizedBox(height: 20.h),
-                      _buildBanner(),
+                      SizedBox(height: 20.h),
+                      
+                      
                       SizedBox(height: 20.h),
                       const CategoryList(),
                       SizedBox(height: 20.h),
@@ -173,64 +174,51 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildSearchBar(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: AppTextField(
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
+      decoration: BoxDecoration(
+        color: Color(0xffFEEBE4),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Track your package",
+            // maxLines: 1,
+            style: TextStyle(
+                // overflow: TextOverflow.ellipsis,
+                fontSize: 16.sp,
+                color: AppColors.black,
+                fontWeight: FontWeight.w600),
+          ),
+          SizedBox(
+            height: 5.h,
+          ),
+          Text(
+            "Please enter the ID number",
+            // maxLines: 1,
+            style: TextStyle(
+                // overflow: TextOverflow.ellipsis,
+                fontSize: 14.sp,
+                color: AppColors.grey,
+                fontWeight: FontWeight.w400),
+          ),
+          SizedBox(
+            height: 20.h,
+          ),
+          AppTextField(
             controller: TextEditingController(),
-            hintText: "search_products".tr(context),
-            prefixIcon: Icon(
+            hintText: "${context.read<GlobalCubit>().currentLocation}",
+            radius: BorderRadiusDirectional.circular(12.r),
+            suffixIcon: Icon(
               CupertinoIcons.search,
               size: 25.sp,
-              color: const Color(0xffB3B3B3),
+              color: AppColors.orange,
             ),
           ),
-        ),
-        SizedBox(width: 10.w),
-        GestureDetector(
-          onTap: () {
-            navigateTo(context, NotificationScreen());
-          },
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 50.w,
-                height: 50.h,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFFF7F7F7),
-                ),
-                child: Icon(
-                  CupertinoIcons.bell,
-                  size: 20.sp,
-                  color: AppColors.black,
-                ),
-              ),
-              PositionedDirectional(
-                end: 0,
-                top: 0,
-                child: Container(
-                  width: 10.w,
-                  height: 10.h,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.red,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBanner() {
-    return Image.asset(
-      "assets/images/png/banner.png",
-      width: double.infinity,
-      fit: BoxFit.cover,
+        ],
+      ),
     );
   }
 }

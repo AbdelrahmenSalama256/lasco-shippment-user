@@ -1,10 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 // import 'package:image_picker/image_picker.dart';
 import 'package:lasco/core/constants/app_constant.dart';
 import 'package:lasco/core/constants/widgets/print_util.dart';
 import 'package:lasco/core/network/local_network.dart';
 import 'package:lasco/core/services/service_locator.dart';
+import 'package:location/location.dart' as loc;
 
 import 'global_state.dart';
 
@@ -12,6 +16,7 @@ class GlobalCubit extends Cubit<GlobalState> {
   GlobalCubit() : super(GlobalInitial());
 
   void init() {
+    getCurrentLocation();
     PrintUtil.warning(
         "User type is ${sl<CacheHelper>().getDataString(key: AppConstants.userType)}");
     PrintUtil.debug(
@@ -45,6 +50,65 @@ class GlobalCubit extends Cubit<GlobalState> {
     cacheHelper.setData(AppConstants.token, token);
     PrintUtil.success("Global token updated: $token");
     emit(GlobalTokenUpdated());
+  }
+
+  //! Location
+  String? currentLocation;
+  double? currentLat;
+  double? currentLong;
+  Future<void> getCurrentLocation() async {
+    loc.Location location = loc.Location();
+    bool serviceEnabled;
+    loc.PermissionStatus permissionGranted;
+
+    // Check if location services are enabled
+    serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        log('Location services are disabled.');
+
+        return;
+      }
+    }
+
+    // Check for permission status
+    permissionGranted = await location.hasPermission();
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != loc.PermissionStatus.granted) {
+        log('Location permission denied.');
+        return;
+      }
+    }
+
+    // Get the current location
+    try {
+      loc.LocationData locationData = await location.getLocation();
+
+      double latitude = locationData.latitude!;
+      double longitude = locationData.longitude!;
+
+      // Convert coordinates to address
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+      Placemark place = placemarks[0];
+      final newAddress =
+          "${place.subThoroughfare}${place.subThoroughfare == '' ? '' : ', '}"
+                  "${place.thoroughfare}${place.thoroughfare == '' ? '' : ', '}"
+                  "${place.subAdministrativeArea}${place.subAdministrativeArea == '' ? '' : ', '}"
+                  "${place.administrativeArea}${place.administrativeArea == '' ? '' : ', '}"
+                  "${place.country}"
+              .trim();
+
+      log('Current Location: $newAddress');
+      log('Lat: $latitude, Lng: $longitude');
+      currentLocation = newAddress;
+      currentLat = latitude;
+      currentLong = longitude;
+    } on Exception catch (e) {
+      log('Location request: $e');
+    }
   }
 
   // ContactResponse? contactResponse;
