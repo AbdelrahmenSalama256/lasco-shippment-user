@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
 
 import '../../../core/component/widgets/app_text_field.dart';
-import '../../home/view/component/widgets/product_grid.dart';
+import '../../home/view/component/widgets/company_grid.dart';
 import 'cubit/shop_cubit.dart';
 import 'cubit/shop_state.dart';
 import 'widgets/filter_bottom_sheet.dart';
@@ -15,28 +15,44 @@ import 'widgets/header_filter.dart';
 class ShopScreen extends StatelessWidget {
   const ShopScreen({super.key});
 
-  // Sample data for products
-  List<ProductModel> _getBigDealsProducts() {
+  // Sample data for companies
+  List<CompanyModel> _getCompanies() {
     return [
-      ProductModel(
+      CompanyModel(
         id: '1',
-        name: 'NIVEA Sun Care',
-        category: 'Skin Care',
-        rating: 4.5,
-        price: '500 LE',
-        imageUrl: 'assets/images/png/test-product.png',
-        isOnSale: true,
-        isFavorite: false,
+        name: 'WALAA INTERRA',
+        description: 'Shipping and logistics company',
+        imageUrl: 'assets/images/png/company1.png',
       ),
-      ProductModel(
+      CompanyModel(
         id: '2',
-        name: 'NIVEA Body Lotion',
-        category: 'Skin Care',
-        rating: 4.5,
-        price: '450 LE',
-        imageUrl: 'assets/images/png/test-product.png',
-        isOnSale: true,
-        isFavorite: false,
+        name: 'LASCO Shipping',
+        description: 'International cargo services',
+        imageUrl: 'assets/images/png/company2.png',
+      ),
+      CompanyModel(
+        id: '3',
+        name: 'Global Express',
+        description: 'Worldwide delivery services',
+        imageUrl: 'assets/images/png/company3.png',
+      ),
+      CompanyModel(
+        id: '4',
+        name: 'Fast Logistics',
+        description: 'Quick and reliable shipping',
+        imageUrl: 'assets/images/png/company4.png',
+      ),
+      CompanyModel(
+        id: '5',
+        name: 'Cargo Masters',
+        description: 'Professional cargo handling',
+        imageUrl: 'assets/images/png/company5.png',
+      ),
+      CompanyModel(
+        id: '6',
+        name: 'ShipEasy',
+        description: 'Simplified shipping solutions',
+        imageUrl: 'assets/images/png/company6.png',
       ),
     ];
   }
@@ -66,11 +82,13 @@ class ShopScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10.h),
                   _buildSearchBar(context),
-                  // SizedBox(height: 10.h),
-                  ProductGrid(
-                    title: "",
-                    products: _getBigDealsProducts(),
-                    childAspectRatio: 0.60,
+                  SizedBox(height: 10.h),
+                  Expanded(
+                    child: CompanyGrid(
+                      title: "",
+                      companies: _getCompanies(),
+                      childAspectRatio: 0.60,
+                    ),
                   ),
                 ],
               );
@@ -87,7 +105,7 @@ class ShopScreen extends StatelessWidget {
         Expanded(
           child: AppTextField(
             controller: TextEditingController(),
-            hintText: "search_products".tr(context),
+            hintText: "search_companies".tr(context), // Changed hint text
             prefixIcon: Icon(
               CupertinoIcons.search,
               size: 25.sp,

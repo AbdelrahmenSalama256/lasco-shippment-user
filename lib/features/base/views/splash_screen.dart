@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lasco/features/auth/view/login_screen.dart';
+import 'package:lasco/features/home/view/home_screen.dart';
 
 import '../../../core/constants/navigation.dart';
 
@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate after animation
     Future.delayed(const Duration(milliseconds: 3000), () {
       if (mounted) {
-        navigateAndFinish(context, LoginScreen());
+        navigateAndFinish(context, HomeScreen());
 
         // Navigate to your main screen
         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));

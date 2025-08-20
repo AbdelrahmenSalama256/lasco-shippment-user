@@ -16,12 +16,12 @@ class GlobalCubit extends Cubit<GlobalState> {
   GlobalCubit() : super(GlobalInitial());
 
   void init() {
-    getCurrentLocation();
     PrintUtil.warning(
         "User type is ${sl<CacheHelper>().getDataString(key: AppConstants.userType)}");
     PrintUtil.debug(
         "User token is ${sl<CacheHelper>().getDataString(key: AppConstants.token)}");
     // getProfile();
+    getCurrentLocation();
   }
 
   int currentNavIndex = 0;

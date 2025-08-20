@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lasco/core/cubit/global_cubit.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
-import 'package:lasco/features/home/view/component/widgets/product_grid.dart';
+import 'package:lasco/features/home/view/component/widgets/company_grid.dart';
 import 'package:lasco/features/offers/views/widgets/custom_app_bar.dart';
 
 class FavouriteScreen extends StatelessWidget {
@@ -24,9 +24,10 @@ class FavouriteScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // SizedBox(height: 25.h),
-            ProductGrid(
-              products: _getBigDealsProducts(),
+            // For favorite companies (if you want to show both)
+            CompanyGrid(
+              title: "favorite_companies".tr(context),
+              companies: _getFavoriteCompanies(),
               childAspectRatio: 0.60,
             ),
           ],
@@ -35,27 +36,19 @@ class FavouriteScreen extends StatelessWidget {
     );
   }
 
-  List<ProductModel> _getBigDealsProducts() {
+  List<CompanyModel> _getFavoriteCompanies() {
     return [
-      ProductModel(
+      CompanyModel(
         id: '1',
-        name: 'NIVEA Sun Care',
-        category: 'Skin Care',
-        rating: 4.5,
-        price: '500 LE',
-        imageUrl: 'assets/images/png/test-product.png',
-        isOnSale: true,
-        isFavorite: true,
+        name: 'WALAA INTERRA',
+        description: 'Shipping and logistics company',
+        imageUrl: 'assets/images/png/company1.png',
       ),
-      ProductModel(
+      CompanyModel(
         id: '2',
-        name: 'NIVEA Body Lotion',
-        category: 'Skin Care',
-        rating: 4.5,
-        price: '450 LE',
-        imageUrl: 'assets/images/png/test-product.png',
-        isOnSale: true,
-        isFavorite: true,
+        name: 'LASCO Shipping',
+        description: 'International cargo services',
+        imageUrl: 'assets/images/png/company2.png',
       ),
     ];
   }
