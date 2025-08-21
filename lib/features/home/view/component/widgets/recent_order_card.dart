@@ -99,7 +99,7 @@ class RecentOrderCard extends StatelessWidget {
               ),
 
               Icon(
-                Icons.arrow_right_alt,
+                Icons.arrow_forward,
                 size: 28.sp,
                 color: AppColors.black,
               ),

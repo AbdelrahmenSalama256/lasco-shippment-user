@@ -1,16 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.lascoshippmentuser">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:label="lascoshippmentuser"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- API KEY MUST BE HERE - inside application but outside activity -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB8sZjSpTijQt3lC9CoIMr0F1izwoJrXjM" />

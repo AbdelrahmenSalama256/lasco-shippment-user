@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lasco/core/component/widgets/app_button.dart';
 import 'package:lasco/core/component/widgets/app_text_field.dart';
+import 'package:lasco/core/constants/navigation.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
+import 'package:lasco/features/package/views/send_package_screen.dart';
 
 class AddressBottomSheet extends StatelessWidget {
   final String address;
@@ -96,12 +98,13 @@ class AddressBottomSheet extends StatelessWidget {
   }
 
   void _confirmLocation(BuildContext context, String landmark, String phone) {
-    Navigator.pop(context, {
-      'lat': markerPosition.latitude,
-      'lng': markerPosition.longitude,
-      'address': address,
-      'landmark': landmark,
-      'phone': phone,
-    });
+    // Navigator.pop(context, {
+    //   'lat': markerPosition.latitude,
+    //   'lng': markerPosition.longitude,
+    //   'address': address,
+    //   'landmark': landmark,
+    //   'phone': phone,
+    // });
+    navigateTo(context, SendPackageScreen());
   }
 }

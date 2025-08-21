@@ -42,13 +42,13 @@ class FavouriteScreen extends StatelessWidget {
         id: '1',
         name: 'WALAA INTERRA',
         description: 'Shipping and logistics company',
-        imageUrl: 'assets/images/png/company1.png',
+        imageUrl: 'assets/images/png/com-2.png',
       ),
       CompanyModel(
         id: '2',
         name: 'LASCO Shipping',
         description: 'International cargo services',
-        imageUrl: 'assets/images/png/company2.png',
+        imageUrl: 'assets/images/png/com-1.png',
       ),
     ];
   }

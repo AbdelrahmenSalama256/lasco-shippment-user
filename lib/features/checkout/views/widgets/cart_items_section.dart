@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lasco/features/cart/views/widgets/product_cart_card.dart';
+import 'package:lasco/features/cart/views/widgets/package_cart_card.dart';
 
 class CartItemsSection extends StatelessWidget {
   const CartItemsSection({super.key});
@@ -12,15 +12,13 @@ class CartItemsSection extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
       child: Column(
         children: [
-          ProductCartCard(
-            image: "assets/images/png/test-product.png",
-            category: "Skin Care",
-            productName: "Bubblzz Body Lotion",
-            price: "500 LE",
-            quantity: 2,
+          PackageCartCard(
+            orderId: "#12345",
+            fromLocation: "Times Square",
+            toLocation: "Manhattan",
+            days: 3,
             onTap: () {},
           ),
-          // Add more ProductCartCard items here if needed
         ],
       ),
     );
