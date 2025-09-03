@@ -23,3 +23,17 @@ class ProfileError extends ProfileState {
 class ProfileUpdated extends ProfileState {}
 
 class ProfileDeleted extends ProfileState {}
+
+class LogoutLoadingState extends ProfileState {}
+
+class LogoutErrorState extends ProfileState {
+  final String massage;
+
+  LogoutErrorState(this.massage);
+}
+
+class LogoutSuccessState extends ProfileState {
+  final String massage;
+
+  LogoutSuccessState(this.massage);
+}

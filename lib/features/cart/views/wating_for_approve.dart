@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lasco/core/constants/app_colors.dart';
 import 'package:lasco/core/constants/navigation.dart';
-import 'package:lasco/core/locale/app_loacl.dart';
 import 'package:lasco/features/checkout/views/checkout_screen.dart';
 
 class WatingForApprove extends StatelessWidget {
@@ -12,8 +11,10 @@ class WatingForApprove extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        Navigator.pop(context);
+
         navigateTo(context, CheckoutScreen());
-        return false;
+        return true;
       },
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -30,7 +31,7 @@ class WatingForApprove extends StatelessWidget {
               ),
               SizedBox(height: 20.h),
               Text(
-                "thanks_for_joining".tr(context),
+                "Request Submitted",
                 style: TextStyle(
                   fontSize: 22.sp,
                   fontWeight: FontWeight.w600,
@@ -39,7 +40,7 @@ class WatingForApprove extends StatelessWidget {
               ),
               SizedBox(height: 10.h),
               Text(
-                "account_under_review".tr(context),
+                "The shipping company will review your request and confirm the delivery cost soon",
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w400,

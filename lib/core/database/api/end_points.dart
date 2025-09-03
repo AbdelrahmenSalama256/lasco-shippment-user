@@ -1,19 +1,20 @@
 // ignore_for_file: constant_identifier_names
 
 class EndPoints {
-  static const String baseUrl = "https://cozy-home.cangrowonline.com/api/";
-  static const String baseUrlWithoutApi =
-      "https://cozy-home.cangrowonline.com/";
+  static const String baseUrl = "https://lasco.evyx.lol/";
+  static const String baseUrlWithoutApi = "https://lasco.evyx.lol/";
   //! Login
-  static const String login = "${baseUrl}login";
-  static const String getProfile = "${baseUrl}contact-details";
+  static const String login = "${baseUrl}api/v1/auth/login";
+  static const String getProfile = "${baseUrl}api/v1/user/me";
   static const String updateProfile = "${baseUrl}profile-update";
 
   //! Register
-  static const String register = "${baseUrl}signup";
+  static const String register = "${baseUrl}api/v1/auth/register";
+  static const String verify = "${baseUrl}api/v1/auth/verify-otp";
+  static const String resendOtp = "${baseUrl}api/v1/auth/resend-otp";
   static const String forgotPassword = "${baseUrl}forget-password";
   //! Logout
-  static const String userLogout = "${baseUrl}logout";
+  static const String userLogout = "${baseUrl}api/v1/auth/logout";
   static const String deleteAccount = "${baseUrl}auth/account-deletion";
   //! Forget Password
 

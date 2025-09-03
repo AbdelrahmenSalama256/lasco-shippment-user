@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lasco/core/constants/app_colors.dart';
+import 'package:lasco/features/profile/views/cubit/profile_cubit.dart';
 
 class ProfileImageSection extends StatelessWidget {
+  final ProfileCubit cubit;
   final VoidCallback onChangeImage;
 
-  const ProfileImageSection({super.key, required this.onChangeImage});
+  const ProfileImageSection(
+      {super.key, required this.onChangeImage, required this.cubit});
 
   @override
   Widget build(BuildContext context) {
@@ -20,27 +25,39 @@ class ProfileImageSection extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
           ),
-          child: Image.asset(
-            "assets/images/png/user1.jpg",
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.circle,
+          child: cubit.profileImage != null
+              ? Image.file(
+                  File(cubit.profileImage!.path),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.person,
+                        size: 50.w,
+                        color: Colors.grey[400],
+                      ),
+                    );
+                  },
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    size: 50.w,
+                    color: Colors.grey[400],
+                  ),
                 ),
-                child: Icon(
-                  Icons.person,
-                  size: 50.w,
-                  color: Colors.grey[400],
-                ),
-              );
-            },
-          ),
         ),
         PositionedDirectional(
           bottom: -20,
-          start: 10,
+          end: 10,
           child: GestureDetector(
             onTap: onChangeImage,
             child: Container(

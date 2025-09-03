@@ -90,6 +90,7 @@
   "name": "Name",
   "email": "Email",
   "enter_email": "Enter your email",
+  "enter_country_code": "Enter Country Code",
   "phone_number": "Phone Number",
   "password": "Password",
   "delete_account": "Delete Account",
@@ -231,5 +232,8 @@
   "enter_address": "Enter Address",
   "add_to_cart": "Add to Cart",
   "est_days": "EST. Days",
-  "days": "Days"
+  "days": "Days",
+  "compeleted": "Completed",
+  "country_code": "Country Code",
+  "acount_created_successfuly": "Account Created Successfuly"
 }

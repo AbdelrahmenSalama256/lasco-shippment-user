@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lasco/core/constants/app_constant.dart';
+import 'package:lasco/features/auth/view/login_screen.dart';
 import 'package:lasco/features/base/views/base_screen.dart';
 
 import '../../../core/constants/navigation.dart';
+import '../../../core/network/local_network.dart';
+import '../../../core/services/service_locator.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -38,10 +42,11 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate after animation
     Future.delayed(const Duration(milliseconds: 3000), () {
       if (mounted) {
-        navigateAndFinish(context, BaseScreen());
-
-        // Navigate to your main screen
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        if (sl<CacheHelper>().getDataString(key: AppConstants.token) == null) {
+          navigateAndFinish(context, LoginScreen());
+        } else {
+          navigateAndFinish(context, BaseScreen());
+        }
       }
     });
   }

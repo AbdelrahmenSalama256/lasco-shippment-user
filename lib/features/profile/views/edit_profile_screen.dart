@@ -6,9 +6,9 @@ import 'package:lasco/core/component/widgets/app_button.dart';
 import 'package:lasco/core/constants/app_colors.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
 import 'package:lasco/features/offers/views/widgets/custom_app_bar.dart';
+import 'package:lasco/features/profile/views/cubit/profile_cubit.dart';
+import 'package:lasco/features/profile/views/cubit/profile_state.dart';
 
-import 'cubit/profile_cubit.dart';
-import 'cubit/profile_state.dart';
 import 'widgets/delete_account_button.dart';
 import 'widgets/profile_form_field.dart';
 import 'widgets/profile_image_section.dart';
@@ -18,77 +18,100 @@ class EditProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileCubit(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: CustomAppBar(
-          title: "edit_profile".tr(context),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        title: "edit_profile".tr(context),
+      ),
+      body: BlocProvider(
+        create: (context) => ProfileCubit()..initializeControllers(),
+        child: BlocBuilder<ProfileCubit, ProfileState>(
+          builder: (context, state) {
+            final cubit = context.read<ProfileCubit>();
+            return Column(
+              children: [
+                Expanded(
+                  child: _ProfileBody(
+                    cubit: cubit,
+                  ),
+                ),
+                _SaveChangesButton(),
+              ],
+            );
+          },
         ),
-        body: _ProfileBody(),
-        bottomNavigationBar: _SaveChangesButton(),
       ),
     );
   }
 }
 
 class _ProfileBody extends StatelessWidget {
+  final ProfileCubit cubit;
+
+  const _ProfileBody({required this.cubit});
+
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ProfileCubit>();
-
-    return BlocListener<ProfileCubit, ProfileState>(
-      listener: (context, state) {
-        if (state is ProfileError) {
-          showToast(context, message: state.message, state: ToastStates.error);
-        } else if (state is ProfileUpdated) {
-          showToast(
-            context,
-            message: "profile_updated_successfully".tr(context),
-            state: ToastStates.success,
-          );
-          Navigator.pop(context);
-        }
-      },
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            // SizedBox(height: 30.h),
-            ProfileImageSection(
-              onChangeImage: () => cubit.changeProfileImage(context),
-            ),
-            SizedBox(height: 40.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                children: [
-                  _NameField(),
-                  SizedBox(height: 20.h),
-                  _EmailField(),
-                  SizedBox(height: 20.h),
-                  _PhoneField(),
-                  SizedBox(height: 20.h),
-                  _PasswordField(),
-                  SizedBox(height: 40.h),
-                  DeleteAccountButton(
-                    onDeletePressed: () =>
-                        cubit.showDeleteConfirmation(context),
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, state) {
+        return BlocListener<ProfileCubit, ProfileState>(
+          listener: (context, state) {
+            if (state is ProfileError) {
+              showToast(context,
+                  message: state.message, state: ToastStates.error);
+            } else if (state is ProfileUpdated) {
+              showToast(
+                context,
+                message: "profile_updated_successfully".tr(context),
+                state: ToastStates.success,
+              );
+              Navigator.pop(context);
+            }
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                ProfileImageSection(
+                  cubit: ProfileCubit(),
+                  onChangeImage: () => cubit.changeProfileImage(context),
+                ),
+                SizedBox(height: 40.h),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    children: [
+                      _NameField(cubit: cubit),
+                      SizedBox(height: 20.h),
+                      _EmailField(cubit: cubit),
+                      SizedBox(height: 20.h),
+                      _PhoneField(cubit: cubit),
+                      SizedBox(height: 20.h),
+                      _PasswordField(cubit: cubit),
+                      SizedBox(height: 40.h),
+                      DeleteAccountButton(
+                        onDeletePressed: () =>
+                            cubit.showDeleteConfirmation(context),
+                      ),
+                      SizedBox(height: 40.h),
+                    ],
                   ),
-                  SizedBox(height: 40.h),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
 
 class _NameField extends StatelessWidget {
+  final ProfileCubit cubit;
+
+  const _NameField({required this.cubit});
+
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ProfileCubit>();
     return ProfileFormField(
       label: "name".tr(context),
       controller: cubit.nameController,
@@ -98,9 +121,12 @@ class _NameField extends StatelessWidget {
 }
 
 class _EmailField extends StatelessWidget {
+  final ProfileCubit cubit;
+
+  const _EmailField({required this.cubit});
+
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ProfileCubit>();
     return BlocBuilder<ProfileCubit, ProfileState>(
       buildWhen: (previous, current) => current is ProfileLoaded,
       builder: (context, state) {
@@ -120,9 +146,11 @@ class _EmailField extends StatelessWidget {
 }
 
 class _PhoneField extends StatelessWidget {
+  final ProfileCubit cubit;
+
+  const _PhoneField({required this.cubit});
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ProfileCubit>();
     return ProfileFormField(
       label: "phone_number".tr(context),
       controller: cubit.phoneController,
@@ -133,9 +161,12 @@ class _PhoneField extends StatelessWidget {
 }
 
 class _PasswordField extends StatelessWidget {
+  final ProfileCubit cubit;
+
+  const _PasswordField({required this.cubit});
+
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ProfileCubit>();
     return BlocBuilder<ProfileCubit, ProfileState>(
       buildWhen: (previous, current) => current is ProfileLoaded,
       builder: (context, state) {

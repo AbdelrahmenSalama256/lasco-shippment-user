@@ -1,7 +1,7 @@
-import 'package:lasco/core/constants/app_colors.dart';
-import 'package:lasco/core/locale/app_loacl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lasco/core/constants/app_colors.dart';
+import 'package:lasco/core/locale/app_loacl.dart';
 
 void showToast(
   BuildContext context, {
@@ -582,7 +582,7 @@ class _FurnitureShapePainter extends CustomPainter {
 Color _getToastColor(ToastStates state) {
   switch (state) {
     case ToastStates.success:
-      return AppColors.primary;
+      return AppColors.green;
     case ToastStates.error:
       return AppColors.red;
     case ToastStates.warning:

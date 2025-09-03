@@ -1,238 +1,184 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lasco/core/locale/app_loacl.dart';
+import 'package:lasco/core/component/widgets/app_button.dart';
+import 'package:lasco/core/locale/app_loacl.dart'; // عشان نستعمل tr(context)
+import 'package:lasco/features/home/view/component/widgets/order_status_bar.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import '../../../../../core/constants/app_colors.dart';
 
 class OrderCard extends StatelessWidget {
-  final String? image;
   final String orderId;
-  final String date;
-  final String productName;
-  final String description;
-  final String total;
-  final int quantity;
-  final VoidCallback? onTap;
+  final int currentStep;
+  final int totalSteps;
+  final String fromDate;
+  final String fromLocation;
+  final String toDate;
+  final String toLocation;
+  final String status;
+  final VoidCallback? onViewDetailsPressed;
 
   const OrderCard({
     super.key,
-    this.image,
     required this.orderId,
-    required this.date,
-    required this.productName,
-    required this.description,
-    required this.total,
-    required this.quantity,
-    this.onTap,
+    required this.currentStep,
+    required this.totalSteps,
+    required this.fromDate,
+    required this.fromLocation,
+    required this.toDate,
+    required this.status,
+    required this.toLocation,
+    this.onViewDetailsPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-        margin: EdgeInsets.only(bottom: 10.h),
-        decoration: BoxDecoration(
-          color: const Color(0xffF7F7F7),
-          borderRadius: BorderRadiusDirectional.only(
-            topEnd: Radius.circular(12.r),
-            topStart: Radius.circular(12.r),
-            bottomStart: Radius.circular(12.r),
-            bottomEnd: Radius.circular(36.r),
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(child: _buildImageSection()),
-            SizedBox(width: 8.w),
-            Expanded(
-              flex: 3,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 15.h),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadiusDirectional.only(
-                    topEnd: Radius.circular(12.r),
-                    topStart: Radius.circular(12.r),
-                    bottomStart: Radius.circular(12.r),
-                    bottomEnd: Radius.circular(36.r),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Order ID and Date
-                    Row(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "order".tr(context),
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.grey,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5.w,
-                            ),
-                            Text(
-                              "#$orderId",
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        Text(
-                          date,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 5.h),
-
-                    // Product Name
-                    Text(
-                      productName,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.black,
-                      ),
-                    ),
-                    SizedBox(height: 5.h),
-
-                    // Description
-                    Text(
-                      description,
-                      style: TextStyle(
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xff008F3C),
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 10.h),
-
-                    // Total and Price
-                    Row(
-                      children: [
-                        Text(
-                          "total".tr(context),
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.grey,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          total,
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.orange,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: const Color(0xffF7F7F7),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Column(
+        children: [
+          // Order ID
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "id_number".tr(context), // بدل ID Number
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.grey,
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImageSection() {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: double.infinity,
-          height: 94.h,
-          decoration: BoxDecoration(
-            color: Colors.grey[50],
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12.r),
-              topRight: Radius.circular(12.r),
-            ),
-          ),
-          child: Center(
-            child: image != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12.r),
-                      topRight: Radius.circular(12.r),
-                    ),
-                    child: Image.asset(
-                      image!,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      errorBuilder: (context, error, stackTrace) {
-                        return _buildPlaceholderImage();
-                      },
-                    ),
-                  )
-                : _buildPlaceholderImage(),
-          ),
-        ),
-
-        // Quantity overlay
-        PositionedDirectional(
-          bottom: 0,
-          end: 0,
-          child: Container(
-            width: 39.w,
-            height: 36.h,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Center(
-              child: Text(
-                "+$quantity",
+              Text(
+                orderId,
                 style: TextStyle(
-                  color: Colors.white,
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w400,
+                  color: AppColors.black,
                 ),
               ),
-            ),
+            ],
           ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildPlaceholderImage() {
-    return Container(
-      height: 80.h,
-      width: 60.w,
-      decoration: BoxDecoration(
-        color: Colors.orange[100],
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Icon(
-        Icons.shopping_bag_outlined,
-        color: Colors.orange[400],
-        size: 30.w,
+          SizedBox(height: 15.h),
+
+          // Order status bar
+          OrderStatusBar(currentStep: currentStep, totalSteps: totalSteps),
+
+          SizedBox(height: 15.h),
+
+          // Locations
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // From
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    fromDate,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    fromLocation,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ],
+              ),
+
+              Icon(
+                Icons.arrow_forward,
+                size: 28.sp,
+                color: AppColors.black,
+              ),
+
+              // To
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    toDate,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    toLocation,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          SizedBox(height: 15.h),
+
+          Divider(
+            color: const Color(0xffF2F2F2),
+            height: 1.h,
+            thickness: 1.h,
+          ),
+
+          SizedBox(height: 15.h),
+
+          // Actions
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                flex: 1,
+                child: AppButton(
+                  text: status,
+                  height: 29.h,
+                  onPressed: () {},
+                  borderRadius: BorderRadius.circular(9.r),
+                  backgroundColor: AppColors.secoundry,
+                  textStyle: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.white,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: TextButton(
+                    onPressed: onViewDetailsPressed,
+                    child: Text(
+                      "view_details".tr(context), // بدل View Details
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.orange,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

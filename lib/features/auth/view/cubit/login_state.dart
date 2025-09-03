@@ -1,10 +1,16 @@
+import '../../data/models/sign_up_models.dart';
+
 abstract class LoginState {}
 
 class LoginInitial extends LoginState {}
 
 class LoginLoading extends LoginState {}
 
-class LoginSuccess extends LoginState {}
+class LoginSuccess extends LoginState {
+  final ResponseModel response;
+
+  LoginSuccess(this.response);
+}
 
 class LoginError extends LoginState {
   final String errorMessage;
@@ -35,3 +41,12 @@ class OtpVerificationError extends LoginState {
 }
 
 class LoginUpdated extends LoginState {}
+
+class ResendOtpCodeLoading extends LoginState {}
+
+class ResendOtpCodeSuccess extends LoginState {}
+
+class ResendOtpCodeError extends LoginState {
+  final String errorMessage;
+  ResendOtpCodeError(this.errorMessage);
+}

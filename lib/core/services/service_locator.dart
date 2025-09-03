@@ -3,6 +3,9 @@ import 'package:get_it/get_it.dart';
 import 'package:lasco/core/cubit/global_cubit.dart';
 import 'package:lasco/core/database/api/dio_consumer.dart';
 import 'package:lasco/core/network/local_network.dart';
+import 'package:lasco/features/auth/data/repo/login_repo.dart';
+import 'package:lasco/features/auth/data/repo/sign_up_repo.dart';
+import 'package:lasco/features/profile/data/repo/profile_repo.dart';
 
 final sl = GetIt.instance;
 void initServiceLocator() {
@@ -11,7 +14,9 @@ void initServiceLocator() {
   sl.registerLazySingleton(() => GlobalCubit());
   sl.registerLazySingleton(() => Dio());
   sl.registerLazySingleton(() => DioConsumer(sl<Dio>()));
-  // sl.registerLazySingleton(() => RegisterRepo(sl<DioConsumer>()));
+  sl.registerLazySingleton(() => SignUpRepo(sl<DioConsumer>()));
+  sl.registerLazySingleton(() => LoginRepo(sl<DioConsumer>()));
+  sl.registerLazySingleton(() => ProfileRepo(sl<DioConsumer>()));
   // sl.registerLazySingleton(() => DataConnectionChecker());
   // sl.registerLazySingleton(() => NetworkInfoImpl(sl<DataConnectionChecker>()));
   //! Repositorys

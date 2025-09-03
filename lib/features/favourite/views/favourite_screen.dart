@@ -6,6 +6,10 @@ import 'package:lasco/core/locale/app_loacl.dart';
 import 'package:lasco/features/home/view/component/widgets/company_grid.dart';
 import 'package:lasco/features/offers/views/widgets/custom_app_bar.dart';
 
+import '../../../core/constants/navigation.dart';
+import '../../company/views/company_details_screen.dart';
+import '../../home/view/component/widgets/company_card.dart';
+
 class FavouriteScreen extends StatelessWidget {
   const FavouriteScreen({super.key});
 
@@ -25,10 +29,29 @@ class FavouriteScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // For favorite companies (if you want to show both)
-            CompanyGrid(
-              title: "favorite_companies".tr(context),
-              companies: _getFavoriteCompanies(),
-              childAspectRatio: 0.60,
+            GridView.builder(
+              shrinkWrap: true,
+              physics: BouncingScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.75,
+                crossAxisSpacing: 12.w,
+                mainAxisSpacing: 12.h,
+                mainAxisExtent: 230.h,
+              ),
+              itemCount: _getFavoriteCompanies().length,
+              itemBuilder: (context, index) {
+                final company = _getFavoriteCompanies()[index];
+                return CompanyCard(
+                  companyName: company.name,
+                  description: company.description,
+                  imageUrl: company.imageUrl,
+                  isFav: true,
+                  onViewPressed: () {
+                    navigateTo(context, CompanyDetailsScreen());
+                  },
+                );
+              },
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lasco/core/constants/app_colors.dart';
@@ -27,17 +28,16 @@ class ProfileHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
             color: const Color(0xffD9D9D9),
           ),
-          child: Image.asset(
+          child: Image.network(
             imagePath,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
-                  shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.person,
+                  CupertinoIcons.person,
                   size: 50.w,
                   color: Colors.grey[400],
                 ),

@@ -4,6 +4,7 @@ import 'package:lasco/core/constants/app_colors.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
 import 'package:lasco/features/offers/views/widgets/custom_app_bar.dart';
 
+import '../../home/data/model/recent_orders_model.dart';
 import '../data/models/order_details_model.dart';
 import '../data/models/order_item_model.dart';
 import 'order_details_screen.dart';
@@ -20,62 +21,52 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<OrderModel> processingOrders = [
-    OrderModel(
-      id: "5544848",
-      productName: "Bubblzz Body Lotion",
-      productImage: "assets/images/png/test-product.png",
-      quantity: 4,
-      date: "Mon 4 Aug",
-      total: "26901 LE",
-      status: OrderStatus.processing,
-      description: "Cocoa Butter Body Lotion 400ml",
+  final List<RecentOrdersModel> processingOrders = [
+    RecentOrdersModel(
+      id: "F124G375",
+      currentStep: 2,
+      totalSteps: 5,
+      fromLocation: "Manhattan",
+      toLocation: "Times Square",
+      fromDate: "18 Jul, 2024",
+      toDate: "18 Jul, 2024",
+      status: "Processing",
     ),
-    OrderModel(
-      id: "5544849",
-      quantity: 4,
-      productName: "Bubblzz Body Lotion",
-      productImage: "assets/images/png/test-product.png",
-      date: "Mon 4 Aug",
-      total: "26901 LE",
-      status: OrderStatus.processing,
-      description: "Cocoa Butter Body Lotion 400ml",
-    ),
-  ];
-
-  final List<OrderModel> deliveredOrders = [
-    OrderModel(
-      id: "5544850",
-      productName: "Bubblzz Body Lotion",
-      productImage: "assets/images/png/test-product.png",
-      date: "Mon 4 Aug",
-      total: "26901 LE",
-      quantity: 2,
-      status: OrderStatus.delivered,
-      description: "Cocoa Butter Body Lotion 400ml",
-    ),
-    OrderModel(
-      id: "5544851",
-      quantity: 3,
-      productName: "Bubblzz Body Lotion",
-      productImage: "assets/images/png/test-product.png",
-      date: "Mon 4 Aug",
-      total: "26901 LE",
-      status: OrderStatus.delivered,
-      description: "Cocoa Butter Body Lotion 400ml",
+    RecentOrdersModel(
+      id: "B978X421",
+      currentStep: 3,
+      totalSteps: 5,
+      fromLocation: "Brooklyn",
+      toLocation: "Queens",
+      fromDate: "19 Jul, 2024",
+      toDate: "19 Jul, 2024",
+      status: "Processing",
     ),
   ];
 
-  final List<OrderModel> cancelledOrders = [
-    OrderModel(
-      id: "5544852",
-      quantity: 2,
-      productName: "Bubblzz Body Lotion",
-      productImage: "assets/images/png/test-product.png",
-      date: "Mon 4 Aug",
-      total: "26901 LE",
-      status: OrderStatus.cancelled,
-      description: "Cocoa Butter Body Lotion 400ml",
+  final List<RecentOrdersModel> deliveredOrders = [
+    RecentOrdersModel(
+      id: "C543H210",
+      currentStep: 5,
+      totalSteps: 5,
+      fromLocation: "Harlem",
+      toLocation: "Bronx",
+      fromDate: "20 Jul, 2024",
+      toDate: "20 Jul, 2024",
+      status: "Delivered",
+    ),
+  ];
+
+  final List<RecentOrdersModel> cancelledOrders = [
+    RecentOrdersModel(
+      id: "D987K654",
+      currentStep: 1,
+      totalSteps: 5,
+      fromLocation: "Staten Island",
+      toLocation: "Manhattan",
+      fromDate: "21 Jul, 2024",
+      toDate: "21 Jul, 2024",
+      status: "Cancelled",
     ),
   ];
 
@@ -121,8 +112,8 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
               ),
               tabs: [
                 Tab(text: "processing".tr(context)),
-                Tab(text: "delivered".tr(context)),
                 Tab(text: "cancelled".tr(context)),
+                Tab(text: "compeleted".tr(context)),
               ],
             ),
           ),
@@ -143,7 +134,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
     );
   }
 
-  Widget _buildOrdersList(List<OrderModel> orders) {
+  Widget _buildOrdersList(List<RecentOrdersModel> orders) {
     if (orders.isEmpty) {
       return Center(
         child: Column(
@@ -173,15 +164,15 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
       itemCount: orders.length,
       itemBuilder: (context, index) {
         return OrderCard(
-          date: orders[index].date,
-          description: orders[index].description,
           orderId: orders[index].id,
-          productName: orders[index].productName,
-          quantity: orders[index].quantity,
-          total: orders[index].total,
-          image: orders[index].productImage,
-          onTap: () {
-            // Convert OrderModel to OrderDetailModel and navigate
+          currentStep: orders[index].currentStep,
+          totalSteps: orders[index].totalSteps,
+          fromDate: orders[index].fromDate,
+          fromLocation: orders[index].fromLocation,
+          toDate: orders[index].toDate,
+          toLocation: orders[index].toLocation,
+          status: orders[index].status ?? "Processing",
+          onViewDetailsPressed: () {
             _navigateToOrderDetails(context, orders[index]);
           },
         );
@@ -189,32 +180,33 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
     );
   }
 
-  void _navigateToOrderDetails(BuildContext context, OrderModel order) {
-    // Convert OrderModel to OrderDetailModel
+  void _navigateToOrderDetails(BuildContext context, RecentOrdersModel order) {
+    // Convert RecentOrdersModel to OrderDetailModel
     final orderDetail = OrderDetailModel(
       orderId: order.id,
-      orderDate: order.date,
-      deliveryAddress: "123 Main St, Cairo, Egypt", // Replace with actual data
-      mobileNumber: "+20 101 234 5678", // Replace with actual data
+      orderDate: order.fromDate,
+      deliveryAddress: "${order.toLocation}, USA", // Replace with actual data
+      mobileNumber: "+1 123 456 7890", // Replace with actual data
       paymentMethods: [
         PaymentMethodModel(
           title: "Cash on Delivery",
-          isCompleted: order.status == OrderStatus.delivered,
+          isCompleted: order.status == "Delivered",
         ),
       ],
       orderItems: [
         OrderItemModel(
           category: "Body Care",
-          productName: order.productName,
-          productImage: order.productImage,
-          price: order.total,
-          quantity: order.quantity,
+          productName: "Bubblzz Body Lotion", // Replace with actual data
+          productImage:
+              "assets/images/png/test-product.png", // Replace with actual data
+          price: "26901 LE",
+          quantity: 1,
         ),
       ],
-      subtotal: order.total,
+      subtotal: "26901 LE", // Replace with actual data
       shipping: "30 LE", // Replace with actual data
-      total: order.total,
-      status: _convertStatus(order.status),
+      total: "26901 LE", // Replace with actual data
+      status: _convertStatus(order.status ?? "Processing"),
     );
 
     Navigator.push(
@@ -225,14 +217,16 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
     );
   }
 
-  OrderDetailStatus _convertStatus(OrderStatus status) {
+  OrderDetailStatus _convertStatus(String status) {
     switch (status) {
-      case OrderStatus.processing:
+      case "Processing":
         return OrderDetailStatus.processing;
-      case OrderStatus.delivered:
+      case "Delivered":
         return OrderDetailStatus.delivered;
-      case OrderStatus.cancelled:
+      case "Cancelled":
         return OrderDetailStatus.cancelled;
+      default:
+        return OrderDetailStatus.processing;
     }
   }
 }

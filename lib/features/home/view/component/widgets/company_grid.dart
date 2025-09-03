@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lasco/core/constants/navigation.dart';
-import 'package:lasco/core/constants/widgets/print_util.dart';
 import 'package:lasco/features/company/views/company_details_screen.dart';
+import 'package:lasco/features/company/views/shopping_companies_screen.dart';
 
 import 'company_card.dart';
 import 'section_header.dart';
@@ -30,7 +30,7 @@ class CompanyGrid extends StatelessWidget {
           title: title ?? "Featured Companies",
           showViewAll: true,
           onViewAll: () {
-            PrintUtil.debug("View all clicked");
+            navigateTo(context, ShoppingCompaniesScreen());
           },
         ),
 

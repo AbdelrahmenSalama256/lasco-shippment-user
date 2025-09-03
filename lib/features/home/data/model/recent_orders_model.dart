@@ -6,8 +6,10 @@ class RecentOrdersModel {
   final String toLocation;
   final String fromDate;
   final String toDate;
+  final String? status;
 
   RecentOrdersModel({
+    this.status,
     required this.id,
     required this.currentStep,
     required this.totalSteps,

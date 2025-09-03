@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../profile/data/models/order_details_model.dart';
-import '../order_comfrimation_screen.dart';
 import '../widgets/address_bottom_sheet.dart';
 import 'checkout_state.dart';
 
@@ -66,15 +65,6 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     orderId = "123456";
     orderDate = "Mon 4 August, 2025";
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (context) => CheckoutCubit(),
-          child: OrderConfirmationScreen(),
-        ),
-      ),
-    );
     emit(CheckoutUpdated());
   }
 
@@ -129,7 +119,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
   void setOrderDetails(OrderDetailModel orderDetail) {
     this.orderDetail = orderDetail;
-    emit(CheckoutUpdated()); // Notify listeners about the change
+    emit(CheckoutUpdated());
   }
 
   @override

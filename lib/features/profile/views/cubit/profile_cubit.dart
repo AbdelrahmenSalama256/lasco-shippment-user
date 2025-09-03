@@ -1,35 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lasco/core/constants/widgets/print_util.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
+import 'package:lasco/features/profile/data/repo/profile_repo.dart';
 
 import '../../../../core/component/widgets/app_custom_dialog.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/cubit/global_cubit.dart';
+import '../../../../core/database/api/end_points.dart';
+import '../../../../core/network/local_network.dart';
+import '../../../../core/services/service_locator.dart';
 import '../widgets/image_picker_bottom_sheet.dart';
 import 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit() : super(ProfileInitial()) {
-    _initControllers();
-    loadInitialData();
+    initializeControllers();
   }
 
   // Controllers
-  late TextEditingController nameController;
-  late TextEditingController emailController;
-  late TextEditingController phoneController;
-  late TextEditingController passwordController;
-
-  // State variables
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
+  XFile? profileImage;
   bool isPasswordVisible = false;
   bool isEmailValid = true;
 
-  void _initControllers() {
-    nameController = TextEditingController();
-    emailController = TextEditingController();
-    phoneController = TextEditingController();
-    passwordController = TextEditingController();
+  void initializeControllers() {
+    final globalCubit = sl<GlobalCubit>();
+    nameController.text = globalCubit.userProfile?.data?.username ?? '';
+    emailController.text = globalCubit.userProfile?.data?.email ?? '';
+    phoneController.text = globalCubit.userProfile?.data?.phone ?? '';
+    emit(ProfileLoaded(
+        isEmailValid: isEmailValid, isPasswordVisible: isPasswordVisible));
   }
 
   @override
@@ -39,24 +45,6 @@ class ProfileCubit extends Cubit<ProfileState> {
     phoneController.dispose();
     passwordController.dispose();
     return super.close();
-  }
-
-  void loadInitialData() {
-    emit(ProfileLoading());
-    try {
-      // Simulate loading data
-      nameController.text = "Sarah Mohamed";
-      emailController.text = "";
-      phoneController.text = "01010101010";
-      passwordController.text = "password123";
-
-      emit(ProfileLoaded(
-        isPasswordVisible: isPasswordVisible,
-        isEmailValid: isEmailValid,
-      ));
-    } catch (e) {
-      emit(ProfileError("Failed to load user data: $e"));
-    }
   }
 
   void togglePasswordVisibility() {
@@ -89,6 +77,21 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (e) {
       emit(ProfileError("Failed to update profile: $e"));
     }
+  }
+
+  //! Logout
+  Future<void> userLogout() async {
+    emit(LogoutLoadingState());
+    final result = await sl<ProfileRepo>().userLogout();
+    result.fold(
+      (l) => emit(LogoutErrorState(l)),
+      (r) {
+        sl<CacheHelper>().removeData(key: ApiKey.token);
+        // sl<CacheHelper>().removeData(key: AppConstants.cookie);
+        // sl<CacheHelper>().removeData(key: ApiKey.wss_token);
+        emit(LogoutSuccessState(r.message ?? ""));
+      },
+    );
   }
 
   void deleteAccount() {

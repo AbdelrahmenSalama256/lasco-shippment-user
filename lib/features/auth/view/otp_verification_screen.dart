@@ -133,7 +133,7 @@ class OtpVerificationScreen extends StatelessWidget {
                           ),
                         ),
                         onCompleted: (pin) {
-                          cubit.verifyOtp(context);
+                          cubit.verifyOtp(context, phoneNumber);
                         },
                         validator: (value) =>
                             Validators.validateOtp(value, context),
@@ -212,7 +212,7 @@ class OtpVerificationScreen extends StatelessWidget {
                       isLoading: state is OtpVerificationLoading,
                       onPressed: () {
                         if (cubit.formKey.currentState!.validate()) {
-                          cubit.verifyOtp(context);
+                          cubit.verifyOtp(context, phoneNumber);
                         } else {
                           showToast(
                             context,

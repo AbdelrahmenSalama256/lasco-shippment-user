@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/repo/sign_up_repo.dart';
 import 'sign_up_state.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
-  SignUpCubit() : super(SignUpInitial());
+  final SignUpRepo signUpRepo;
+
+  SignUpCubit(this.signUpRepo) : super(SignUpInitial());
 
   // Controllers
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final emailController = TextEditingController();
+  final countryCodeController = TextEditingController();
 
   // Form Key
   final formKey = GlobalKey<FormState>();
@@ -29,19 +34,25 @@ class SignUpCubit extends Cubit<SignUpState> {
     emit(SignUpStrongPasswordChanged(isStrongPassword));
   }
 
-  void signUp(BuildContext context) {
+  Future<void> signUp() async {
     if (!formKey.currentState!.validate()) return;
-    Future.delayed(const Duration(seconds: 2), () {
-      emit(SignUpSuccess());
-    });
-  }
 
-  @override
-  Future<void> close() {
-    nameController.dispose();
-    phoneController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    return super.close();
+    emit(SignUpLoading());
+
+    final result = await signUpRepo.registerUser(
+      username: nameController.text,
+      phone: phoneController.text,
+      email: emailController.text,
+      password: passwordController.text,
+      passwordConfirmation: confirmPasswordController.text,
+      countryCode: countryCodeController.text,
+    );
+
+    result.fold(
+      (error) => emit(SignUpError(error)),
+      (response) {
+        emit(SignUpSuccess());
+      },
+    );
   }
 }

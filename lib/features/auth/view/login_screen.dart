@@ -9,6 +9,7 @@ import 'package:lasco/features/auth/view/cubit/login_state.dart';
 import 'package:lasco/features/auth/view/sign_up_screen.dart';
 import 'package:lasco/features/base/views/base_screen.dart';
 
+import '../../../core/component/custom_toast.dart';
 import '../../../core/constants/navigation.dart';
 import '../../../core/utils/validator.dart';
 import 'cubit/login_cubit.dart';
@@ -27,6 +28,9 @@ class LoginScreen extends StatelessWidget {
           return BlocListener<LoginCubit, LoginState>(
             listener: (context, state) {
               if (state is LoginSuccess) {
+                showToast(context,
+                    message: "${state.response.message}",
+                    state: ToastStates.success);
                 navigateAndFinish(context, BaseScreen());
               }
             },
@@ -75,6 +79,53 @@ class LoginScreen extends StatelessWidget {
                           key: cubit.formKey,
                           child: Column(
                             children: [
+                              // Login as guest
+                              InkWell(
+                                onTap: () {
+                                  navigateAndFinish(context, BaseScreen());
+                                },
+                                child: Text(
+                                  "login_as_guest".tr(context),
+                                  style: TextStyle(
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.w400,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: AppColors.orange,
+                                    color: AppColors.orange,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 25.h),
+
+                              // Divider with "or"
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Divider(
+                                      color: Color(0xffF7F7F7),
+                                      height: 1.h,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Text(
+                                    "or".tr(context),
+                                    style: TextStyle(
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.black,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Expanded(
+                                    child: Divider(
+                                      color: Color(0xffF7F7F7),
+                                      height: 1.h,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 25.h),
+
                               Text(
                                 "text_login".tr(context),
                                 style: TextStyle(
@@ -132,7 +183,7 @@ class LoginScreen extends StatelessWidget {
                               AppButton(
                                 text: "text_login".tr(context),
                                 isLoading: state is LoginLoading,
-                                onPressed: () => cubit.login(context),
+                                onPressed: () => cubit.userLogin(context),
                                 backgroundColor: AppColors.orange,
                               ),
                               SizedBox(height: 25.h),
@@ -168,53 +219,53 @@ class LoginScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 25.h),
+                              // SizedBox(height: 25.h),
 
-                              // Divider with "or"
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Divider(
-                                      color: Color(0xffF7F7F7),
-                                      height: 1.h,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Text(
-                                    "or".tr(context),
-                                    style: TextStyle(
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.black,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Expanded(
-                                    child: Divider(
-                                      color: Color(0xffF7F7F7),
-                                      height: 1.h,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              // // Divider with "or"
+                              // Row(
+                              //   children: [
+                              //     Expanded(
+                              //       child: Divider(
+                              //         color: Color(0xffF7F7F7),
+                              //         height: 1.h,
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 8.w),
+                              //     Text(
+                              //       "or".tr(context),
+                              //       style: TextStyle(
+                              //         fontSize: 10.sp,
+                              //         fontWeight: FontWeight.w400,
+                              //         color: AppColors.black,
+                              //       ),
+                              //     ),
+                              //     SizedBox(width: 8.w),
+                              //     Expanded(
+                              //       child: Divider(
+                              //         color: Color(0xffF7F7F7),
+                              //         height: 1.h,
+                              //       ),
+                              //     ),
+                              //   ],
+                              // ),
 
-                              // Login as guest
-                              SizedBox(height: 25.h),
-                              InkWell(
-                                onTap: () {
-                                  navigateAndFinish(context, BaseScreen());
-                                },
-                                child: Text(
-                                  "login_as_guest".tr(context),
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w400,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: AppColors.orange,
-                                    color: AppColors.orange,
-                                  ),
-                                ),
-                              ),
+                              // // Login as guest
+                              // SizedBox(height: 25.h),
+                              // InkWell(
+                              //   onTap: () {
+                              //     navigateAndFinish(context, BaseScreen());
+                              //   },
+                              //   child: Text(
+                              //     "login_as_guest".tr(context),
+                              //     style: TextStyle(
+                              //       fontSize: 14.sp,
+                              //       fontWeight: FontWeight.w400,
+                              //       decoration: TextDecoration.underline,
+                              //       decorationColor: AppColors.orange,
+                              //       color: AppColors.orange,
+                              //     ),
+                              //   ),
+                              // ),
 
                               // Space for keyboard
                               SizedBox(

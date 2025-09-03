@@ -231,5 +231,9 @@
   "enter_address": "أدخل العنوان",
   "add_to_cart": "أضف إلى السلة",
   "est_days": "الأيام المتوقعة",
-  "days": "أيام"
+  "days": "أيام",
+  "compeleted": "مكتملة",
+  "enter_country_code": "اكتب رمز دولتك",
+  "country_code": "رمز الدولة",
+  "acount_created_successfuly": "تم انشاء الحساب بنجاح"
 }

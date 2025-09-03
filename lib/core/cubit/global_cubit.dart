@@ -1,26 +1,33 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
-// import 'package:image_picker/image_picker.dart';
 import 'package:lasco/core/constants/app_constant.dart';
 import 'package:lasco/core/constants/widgets/print_util.dart';
 import 'package:lasco/core/network/local_network.dart';
 import 'package:lasco/core/services/service_locator.dart';
+import 'package:lasco/features/auth/data/models/sign_up_models.dart';
 import 'package:location/location.dart' as loc;
 
+import '../../features/profile/data/repo/profile_repo.dart';
 import 'global_state.dart';
 
 class GlobalCubit extends Cubit<GlobalState> {
   GlobalCubit() : super(GlobalInitial());
 
+  ResponseModel? userProfile;
+  String? username;
+  String? email;
+  String? phone;
+  String? countryCode;
+  String? image;
+  String? createdAt;
+  String? updatedAt;
+
   void init() {
-    PrintUtil.warning(
-        "User type is ${sl<CacheHelper>().getDataString(key: AppConstants.userType)}");
-    PrintUtil.debug(
-        "User token is ${sl<CacheHelper>().getDataString(key: AppConstants.token)}");
-    // getProfile();
+    getProfile();
     getCurrentLocation();
   }
 
@@ -52,7 +59,71 @@ class GlobalCubit extends Cubit<GlobalState> {
     emit(GlobalTokenUpdated());
   }
 
-  //! Location
+  Future<void> getProfile({bool forceRefresh = false}) async {
+    emit(ProfileLoading());
+
+    final cacheHelper = sl<CacheHelper>();
+    final token = cacheHelper.getDataString(key: AppConstants.token);
+
+    if (token == null) {
+      PrintUtil.error("No token found, user is not logged in.");
+      emit(ProfileError(message: "No token found, please log in."));
+      return;
+    }
+
+    // Load from cache if available and not forcing refresh
+    if (!forceRefresh &&
+        cacheHelper.getDataString(key: AppConstants.userProfile) != null) {
+      try {
+        userProfile = ResponseModel.fromJson(jsonDecode(
+            cacheHelper.getDataString(key: AppConstants.userProfile)!));
+        _updateUserData(userProfile!);
+        PrintUtil.success(
+            "Loaded user profile from cache: ${userProfile!.data?.username}");
+        emit(ProfileLoaded());
+        // Fetch fresh data in the background
+        _fetchAndUpdateProfile();
+        return;
+      } catch (e) {
+        PrintUtil.error("Error parsing cached profile: $e");
+      }
+    }
+
+    // Fetch from server if no cache or forceRefresh is true
+    await _fetchAndUpdateProfile();
+  }
+
+  Future<void> _fetchAndUpdateProfile() async {
+    final response = await sl<ProfileRepo>().getUserProfile();
+    response.fold(
+      (failure) {
+        PrintUtil.error("Failed to get profile: $failure");
+        emit(ProfileError(message: failure));
+      },
+      (profileResponse) {
+        userProfile = profileResponse;
+        _updateUserData(profileResponse);
+        sl<CacheHelper>().setData(
+            AppConstants.userProfile, jsonEncode(profileResponse.toJson()));
+        PrintUtil.success(
+            "User profile fetched successfully: ${profileResponse.data?.username}");
+        PrintUtil.info(
+            "Cached user profile: ${sl<CacheHelper>().getDataString(key: AppConstants.userProfile)}");
+        emit(ProfileLoaded());
+      },
+    );
+  }
+
+  void _updateUserData(ResponseModel userData) {
+    username = userData.data?.username;
+    email = userData.data?.email;
+    phone = userData.data?.phone;
+    countryCode = userData.data?.countryCode;
+    image = userData.data?.image;
+    createdAt = userData.data?.createdAt;
+    updatedAt = userData.data?.updatedAt;
+  }
+
   String? currentLocation;
   double? currentLat;
   double? currentLong;
@@ -61,18 +132,15 @@ class GlobalCubit extends Cubit<GlobalState> {
     bool serviceEnabled;
     loc.PermissionStatus permissionGranted;
 
-    // Check if location services are enabled
     serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
       if (!serviceEnabled) {
         log('Location services are disabled.');
-
         return;
       }
     }
 
-    // Check for permission status
     permissionGranted = await location.hasPermission();
     if (permissionGranted == loc.PermissionStatus.denied) {
       permissionGranted = await location.requestPermission();
@@ -82,14 +150,10 @@ class GlobalCubit extends Cubit<GlobalState> {
       }
     }
 
-    // Get the current location
     try {
       loc.LocationData locationData = await location.getLocation();
-
       double latitude = locationData.latitude!;
       double longitude = locationData.longitude!;
-
-      // Convert coordinates to address
       List<Placemark> placemarks =
           await placemarkFromCoordinates(latitude, longitude);
       Placemark place = placemarks[0];
@@ -110,102 +174,4 @@ class GlobalCubit extends Cubit<GlobalState> {
       log('Location request: $e');
     }
   }
-
-  // ContactResponse? contactResponse;
-
-  // Future<void> getProfile({bool forceRefresh = false}) async {
-  //   emit(ProfileLoading());
-
-  //   final cacheHelper = sl<CacheHelper>();
-  //   final token = cacheHelper.getDataString(key: AppConstants.token);
-
-  //   if (token == null) {
-  //     PrintUtil.error("No token found, user is not logged in.");
-  //     emit(ProfileError(message: "No token found, please log in."));
-  //     return;
-  //   }
-
-  //   // Load from cache if available and not forcing refresh
-  //   if (!forceRefresh &&
-  //       cacheHelper.getDataString(key: AppConstants.userProfile) != null) {
-  //     try {
-  //       contactResponse = ContactResponse.fromJson(jsonDecode(
-  //           cacheHelper.getDataString(key: AppConstants.userProfile)!));
-  //       PrintUtil.success(
-  //           "Loaded user profile from cache: ${contactResponse!.data.user.name}");
-  //       emit(ProfileLoaded());
-  //       // Fetch fresh data in the background
-  //       _fetchAndUpdateProfile();
-  //       return;
-  //     } catch (e) {
-  //       PrintUtil.error("Error parsing cached profile: $e");
-  //     }
-  //   }
-
-  //   // Fetch from server if no cache or forceRefresh is true
-  //   await _fetchAndUpdateProfile();
-  // }
-
-  // Future<void> _fetchAndUpdateProfile() async {
-  //   final response = await sl<ProfileRepo>().getProfile();
-  //   response.fold(
-  //     (failure) {
-  //       PrintUtil.error("Failed to get profile: $failure");
-  //       emit(ProfileError(message: failure));
-  //     },
-  //     (contactResponse) {
-  //       contactResponse = contactResponse;
-  //       sl<CacheHelper>().setData(
-  //           AppConstants.userProfile, jsonEncode(contactResponse.toJson()));
-  //       PrintUtil.success(
-  //           "User profile fetched successfully: ${contactResponse.data.user.name}");
-  //       emit(ProfileLoaded());
-  //     },
-  //   );
-  // }
-
-  // Future<void> updateProfile({
-  //   String? name,
-  //   String? email,
-  //   String? mobile,
-  //   XFile? image,
-  // }) async {
-  //   emit(ProfileLoading());
-  //   final response = await sl<ProfileRepo>().updateProfile(
-  //     name: name,
-  //     email: email,
-  //     mobile: mobile,
-  //     image: image,
-  //   );
-  //   response.fold(
-  //     (failure) {
-  //       PrintUtil.error("Failed to update profile: $failure");
-  //       emit(ProfileError(message: failure));
-  //     },
-  //     (message) {
-  //       PrintUtil.success("Profile updated successfully: $message");
-  //       getProfile();
-  //       emit(ProfileUpdated());
-  //     },
-  //   );
-  // }
-
-  // Future<void> logout() async {
-  //   emit(LogoutLoading());
-  //   final response = await sl<ProfileRepo>().logout();
-  //   response.fold(
-  //     (failure) {
-  //       PrintUtil.error("Failed to logout: $failure");
-  //       emit(LogoutError(failure));
-  //     },
-  //     (message) {
-  //       contactResponse = null;
-  //       sl<CacheHelper>().removeData(key: AppConstants.userProfile);
-  //       sl<CacheHelper>().removeData(key: AppConstants.token);
-  //       currentNavIndex = 0;
-  //       PrintUtil.success("Logged out successfully: $message");
-  //       emit(LogoutSuccess(message));
-  //     },
-  //   );
-  // }
 }
