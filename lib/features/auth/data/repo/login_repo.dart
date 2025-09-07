@@ -9,7 +9,80 @@ class LoginRepo {
   final ApiConsumer api;
 
   LoginRepo(this.api);
-  //! Register
+
+  //! Forget Password - Send OTP
+  Future<Either<String, ResponseModel>> sendForgotPasswordOtp({
+    required String phone,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.sendOtpReset,
+        data: {
+          "phone": phone,
+        },
+      );
+
+      return Right(ResponseModel.fromJson(response.data));
+    } on ServerException catch (e) {
+      return Left(e.errorModel.detail);
+    } on NoInternetException catch (e) {
+      return Left(e.errorModel.detail);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  //! Forget Password - Verify OTP
+  Future<Either<String, ResponseModel>> verifyForgotPasswordOtp({
+    required String phone,
+    required String code,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.verifyForgotPasswordOtp,
+        data: {
+          "phone": phone,
+          "code": code,
+        },
+      );
+
+      return Right(ResponseModel.fromJson(response.data));
+    } on ServerException catch (e) {
+      return Left(e.errorModel.detail);
+    } on NoInternetException catch (e) {
+      return Left(e.errorModel.detail);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  //! Forget Password - Reset Password
+  Future<Either<String, ResponseModel>> resetPassword({
+    required String phone,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.resetPassword,
+        data: {
+          "password": newPassword,
+          'phone': phone,
+          "password_confirmation": confirmPassword,
+        },
+      );
+
+      return Right(ResponseModel.fromJson(response.data));
+    } on ServerException catch (e) {
+      return Left(e.errorModel.detail);
+    } on NoInternetException catch (e) {
+      return Left(e.errorModel.detail);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  //! Keep your existing methods...
   Future<Either<String, ResponseModel>> userLogin({
     required String phone,
     required String password,
@@ -33,7 +106,6 @@ class LoginRepo {
     }
   }
 
-  //! Register
   Future<Either<String, ResponseModel>> verifyOtp({
     required String phone,
     required String code,
@@ -69,30 +141,6 @@ class LoginRepo {
       );
 
       return Right(response.data['message']);
-    } on ServerException catch (e) {
-      return Left(e.errorModel.detail);
-    } on NoInternetException catch (e) {
-      return Left(e.errorModel.detail);
-    } catch (e) {
-      return Left(e.toString());
-    }
-  }
-
-  //! Register
-  Future<Either<String, ResponseModel>> sendVerifyOtp({
-    required String phone,
-    required String code,
-  }) async {
-    try {
-      final response = await api.post(
-        EndPoints.verify,
-        data: {
-          "phone": phone,
-          "code": code,
-        },
-      );
-
-      return Right(ResponseModel.fromJson(response.data));
     } on ServerException catch (e) {
       return Left(e.errorModel.detail);
     } on NoInternetException catch (e) {

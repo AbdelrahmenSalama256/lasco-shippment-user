@@ -33,6 +33,10 @@ class LoginScreen extends StatelessWidget {
                     state: ToastStates.success);
                 navigateAndFinish(context, BaseScreen());
               }
+              if (state is LoginError) {
+                showToast(context,
+                    message: state.errorMessage, state: ToastStates.error);
+              }
             },
             child: Scaffold(
               resizeToAvoidBottomInset: false,

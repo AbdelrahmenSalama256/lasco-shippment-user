@@ -59,6 +59,57 @@ class GlobalCubit extends Cubit<GlobalState> {
     emit(GlobalTokenUpdated());
   }
 
+  /// Update user profile after successful profile update
+  void updateUserProfile(ResponseModel? updatedProfile) {
+    if (updatedProfile != null) {
+      userProfile = updatedProfile;
+      _updateUserData(updatedProfile);
+      
+      // Cache the updated profile
+      sl<CacheHelper>().setData(
+        AppConstants.userProfile, 
+        jsonEncode(updatedProfile.toJson())
+      );
+      
+      PrintUtil.success("Global user profile updated: ${updatedProfile.data?.username}");
+      emit(ProfileUpdated()); // Emit state to notify UI
+    }
+  }
+
+  /// Update user profile with individual fields (fallback method)
+  void updateUserProfileWithFields({
+    String? username,
+    String? email,
+    String? phone,
+    String? imageUrl,
+    String? countryCode,
+  }) {
+    if (userProfile?.data != null) {
+      userProfile = ResponseModel(
+        data: UserData(
+          username: username ?? this.username ?? '',
+          email: email ?? this.email ?? '',
+          phone: phone ?? this.phone ?? '',
+          image: imageUrl ?? image,
+          countryCode: countryCode ?? this.countryCode,
+          createdAt: createdAt,
+          updatedAt: DateTime.now().toIso8601String(),
+        ),
+      );
+      
+      _updateUserData(userProfile!);
+      
+      // Cache the updated profile
+      sl<CacheHelper>().setData(
+        AppConstants.userProfile, 
+        jsonEncode(userProfile!.toJson())
+      );
+      
+      PrintUtil.success("Global user profile updated with fields: $username");
+      emit(ProfileUpdated());
+    }
+  }
+
   Future<void> getProfile({bool forceRefresh = false}) async {
     emit(ProfileLoading());
 
@@ -124,6 +175,11 @@ class GlobalCubit extends Cubit<GlobalState> {
     updatedAt = userData.data?.updatedAt;
   }
 
+  /// Refresh profile after update - this will fetch the latest data from server
+  Future<void> refreshProfile() async {
+    await getProfile(forceRefresh: true);
+  }
+
   String? currentLocation;
   double? currentLat;
   double? currentLong;
@@ -170,8 +226,24 @@ class GlobalCubit extends Cubit<GlobalState> {
       currentLocation = newAddress;
       currentLat = latitude;
       currentLong = longitude;
+      emit(LocationUpdated());
     } on Exception catch (e) {
       log('Location request: $e');
+      emit(LocationError(message: e.toString()));
     }
+  }
+
+  /// Clear user profile data (used on logout)
+  void clearUserProfile() {
+    userProfile = null;
+    username = null;
+    email = null;
+    phone = null;
+    countryCode = null;
+    image = null;
+    createdAt = null;
+    updatedAt = null;
+    sl<CacheHelper>().removeData(key: AppConstants.userProfile);
+    emit(ProfileCleared());
   }
 }

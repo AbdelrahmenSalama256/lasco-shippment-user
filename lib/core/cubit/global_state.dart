@@ -84,3 +84,13 @@ class LanguageChangingState extends GlobalState {}
 class LanguageChangedState extends GlobalState {}
 
 class GlobalTokenUpdated extends GlobalState {}
+
+class ProfileCleared extends GlobalState {}
+
+class LocationError extends GlobalState {
+  final String message;
+
+  LocationError({required this.message});
+}
+
+class LocationUpdated extends GlobalState {}

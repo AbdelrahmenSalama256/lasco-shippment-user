@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lasco/core/cubit/global_cubit.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
-import 'package:lasco/features/home/view/component/widgets/company_grid.dart';
 import 'package:lasco/features/offers/views/widgets/custom_app_bar.dart';
 
 import '../../../core/constants/navigation.dart';
 import '../../company/views/company_details_screen.dart';
+import '../../home/data/model/company_model.dart';
 import '../../home/view/component/widgets/company_card.dart';
 
 class FavouriteScreen extends StatelessWidget {
@@ -43,12 +43,16 @@ class FavouriteScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final company = _getFavoriteCompanies()[index];
                 return CompanyCard(
-                  companyName: company.name,
-                  description: company.description,
-                  imageUrl: company.imageUrl,
+                  companyName: company.name ?? "",
+                  description: company.description ?? "",
+                  imageUrl: company.logo,
                   isFav: true,
                   onViewPressed: () {
-                    navigateTo(context, CompanyDetailsScreen());
+                    navigateTo(
+                        context,
+                        CompanyDetailsScreen(
+                          id: company.id ?? 0,
+                        ));
                   },
                 );
               },
@@ -62,17 +66,11 @@ class FavouriteScreen extends StatelessWidget {
   List<CompanyModel> _getFavoriteCompanies() {
     return [
       CompanyModel(
-        id: '1',
+        id: 1,
         name: 'WALAA INTERRA',
         description: 'Shipping and logistics company',
-        imageUrl: 'assets/images/png/com-2.png',
-      ),
-      CompanyModel(
-        id: '2',
-        name: 'LASCO Shipping',
-        description: 'International cargo services',
-        imageUrl: 'assets/images/png/com-1.png',
-      ),
+        logo: 'assets/images/png/com-2.png',
+      )
     ];
   }
 }

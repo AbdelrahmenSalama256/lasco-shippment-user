@@ -49,6 +49,9 @@
 	<string>We need access to your photo library to upload shipment images.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to take shipment images.</string>
-
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to take profile photos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to select profile photos</string>
 </dict>
 </plist>

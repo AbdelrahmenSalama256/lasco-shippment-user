@@ -166,7 +166,7 @@ class CompanyCard extends StatelessWidget {
                       topLeft: Radius.circular(12.r),
                       topRight: Radius.circular(12.r),
                     ),
-                    child: Image.asset(
+                    child: Image.network(
                       imageUrl!,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {

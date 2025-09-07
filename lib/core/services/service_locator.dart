@@ -7,6 +7,8 @@ import 'package:lasco/features/auth/data/repo/login_repo.dart';
 import 'package:lasco/features/auth/data/repo/sign_up_repo.dart';
 import 'package:lasco/features/profile/data/repo/profile_repo.dart';
 
+import '../../features/home/data/repo/company_repo.dart';
+
 final sl = GetIt.instance;
 void initServiceLocator() {
 //!external
@@ -17,6 +19,7 @@ void initServiceLocator() {
   sl.registerLazySingleton(() => SignUpRepo(sl<DioConsumer>()));
   sl.registerLazySingleton(() => LoginRepo(sl<DioConsumer>()));
   sl.registerLazySingleton(() => ProfileRepo(sl<DioConsumer>()));
+  sl.registerLazySingleton(() => CompanyRepo(sl<DioConsumer>()));
   // sl.registerLazySingleton(() => DataConnectionChecker());
   // sl.registerLazySingleton(() => NetworkInfoImpl(sl<DataConnectionChecker>()));
   //! Repositorys

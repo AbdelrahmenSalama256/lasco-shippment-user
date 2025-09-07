@@ -6,13 +6,15 @@ abstract class ApiConsumer {
     Map<String, dynamic>? queryParameters,
     bool isFormData = false,
   });
+
   //!post
   Future<dynamic> post(
     String path, {
-    Object? data,
+    dynamic data,
     Map<String, dynamic>? queryParameters,
     bool isFormData = false,
   });
+
   //!patch
   Future<dynamic> patch(
     String path, {
@@ -20,6 +22,7 @@ abstract class ApiConsumer {
     Map<String, dynamic>? queryParameters,
     bool isFormData = false,
   });
+
   //!put
   Future<dynamic> put(
     String path, {
@@ -27,6 +30,7 @@ abstract class ApiConsumer {
     Map<String, dynamic>? queryParameters,
     bool isFormData = false,
   });
+
   //!delete
   Future<dynamic> delete(
     String path, {

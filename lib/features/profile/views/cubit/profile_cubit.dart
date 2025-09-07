@@ -26,6 +26,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
   XFile? profileImage;
+  String? serverImageUrl;
   bool isPasswordVisible = false;
   bool isEmailValid = true;
 
@@ -34,8 +35,13 @@ class ProfileCubit extends Cubit<ProfileState> {
     nameController.text = globalCubit.userProfile?.data?.username ?? '';
     emailController.text = globalCubit.userProfile?.data?.email ?? '';
     phoneController.text = globalCubit.userProfile?.data?.phone ?? '';
+    serverImageUrl = globalCubit.userProfile?.data?.image;
+
     emit(ProfileLoaded(
-        isEmailValid: isEmailValid, isPasswordVisible: isPasswordVisible));
+        isEmailValid: isEmailValid,
+        isPasswordVisible: isPasswordVisible,
+        profileImage: profileImage,
+        serverImageUrl: serverImageUrl));
   }
 
   @override
@@ -50,31 +56,77 @@ class ProfileCubit extends Cubit<ProfileState> {
   void togglePasswordVisibility() {
     isPasswordVisible = !isPasswordVisible;
     emit(ProfileLoaded(
-      isPasswordVisible: isPasswordVisible,
-      isEmailValid: isEmailValid,
-    ));
+        isPasswordVisible: isPasswordVisible,
+        isEmailValid: isEmailValid,
+        profileImage: profileImage,
+        serverImageUrl: serverImageUrl));
   }
 
   void validateEmail(String email) {
     isEmailValid = email.isEmpty ||
         RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
     emit(ProfileLoaded(
-      isPasswordVisible: isPasswordVisible,
-      isEmailValid: isEmailValid,
-    ));
-  }
-
-  void updateProfile() {
-    emit(ProfileLoading());
-    try {
-      // Here you would normally save the data
-      PrintUtil.success("Profile updated successfully");
-      emit(ProfileUpdated());
-      emit(ProfileLoaded(
         isPasswordVisible: isPasswordVisible,
         isEmailValid: isEmailValid,
-      ));
+        profileImage: profileImage,
+        serverImageUrl: serverImageUrl));
+  }
+
+  Future<void> updateProfile() async {
+    if (!isEmailValid) {
+      emit(ProfileError("Please enter a valid email address"));
+      return;
+    }
+
+    // Validate password if provided
+    final password = passwordController.text.trim();
+    if (password.isNotEmpty && password.length < 8) {
+      emit(ProfileError("Password must be at least 8 characters"));
+      return;
+    }
+
+    emit(ProfileLoading());
+
+    try {
+      final globalCubit = sl<GlobalCubit>();
+
+      final result = await sl<ProfileRepo>().updateProfile(
+        username: nameController.text.trim(),
+        phone: phoneController.text.trim(),
+        email: emailController.text.trim(),
+        image: profileImage,
+        password: password.isNotEmpty ? password : null,
+        countryCode: globalCubit.countryCode ?? '+20',
+      );
+
+      result.fold(
+        (error) {
+          PrintUtil.error("Profile update failed: $error");
+          emit(ProfileError(error));
+        },
+        (updatedProfileResponse) {
+          PrintUtil.success("Profile updated successfully");
+          globalCubit.updateUserProfile(updatedProfileResponse);
+
+          profileImage = null;
+
+          nameController.text = updatedProfileResponse.data?.username ?? '';
+          emailController.text = updatedProfileResponse.data?.email ?? '';
+          phoneController.text = updatedProfileResponse.data?.phone ?? '';
+          serverImageUrl = updatedProfileResponse.data?.image ?? '';
+
+          emit(ProfileUpdated());
+          emit(ProfileLoaded(
+              isPasswordVisible: isPasswordVisible,
+              isEmailValid: true,
+              profileImage: profileImage,
+              serverImageUrl: serverImageUrl));
+
+          globalCubit.refreshProfile();
+        },
+      );
     } catch (e) {
+      PrintUtil.error("Unexpected error during profile update: $e");
       emit(ProfileError("Failed to update profile: $e"));
     }
   }
@@ -87,38 +139,120 @@ class ProfileCubit extends Cubit<ProfileState> {
       (l) => emit(LogoutErrorState(l)),
       (r) {
         sl<CacheHelper>().removeData(key: ApiKey.token);
-        // sl<CacheHelper>().removeData(key: AppConstants.cookie);
-        // sl<CacheHelper>().removeData(key: ApiKey.wss_token);
+        sl<GlobalCubit>().clearUserProfile(); // Clear global data
         emit(LogoutSuccessState(r.message ?? ""));
       },
     );
   }
 
-  void deleteAccount() {
+  Future<void> deleteAccount() async {
+    // Fixed: Use repo instead of simulate
     emit(ProfileLoading());
     try {
-      // Simulate account deletion
-      PrintUtil.success("Account deleted successfully");
-      emit(ProfileDeleted());
+      final result = await sl<ProfileRepo>().deleteAccount();
+      result.fold(
+        (error) {
+          PrintUtil.error("Failed to delete account: $error");
+          emit(ProfileError(error));
+        },
+        (response) {
+          PrintUtil.success("Account deleted successfully");
+          sl<GlobalCubit>().clearUserProfile(); // Clear global data
+          emit(ProfileDeleted());
+        },
+      );
     } catch (e) {
       emit(ProfileError("Failed to delete account: $e"));
     }
   }
 
-  void changeProfileImage(BuildContext context) {
+  /// Pick image from camera or gallery
+  Future<void> changeProfileImage(BuildContext context) async {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) => ImagePickerBottomSheet(
-        onCameraPressed: () {
+        onCameraPressed: () async {
           Navigator.pop(context);
-          // Handle camera
+          await _pickImage(context, ImageSource.camera);
         },
-        onGalleryPressed: () {
+        onGalleryPressed: () async {
           Navigator.pop(context);
-          // Handle gallery
+          await _pickImage(context, ImageSource.gallery);
         },
       ),
     );
+  }
+
+  /// Internal method to handle image picking
+  Future<void> _pickImage(BuildContext context, ImageSource source) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        // Check file size (limit to 5MB)
+        final fileBytes = await image.length();
+        final fileSizeInMB = fileBytes / (1024 * 1024);
+        if (fileSizeInMB > 5) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Image size should be less than 5MB"),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
+
+        profileImage = image;
+        emit(ProfileLoaded(
+          isPasswordVisible: isPasswordVisible,
+          isEmailValid: isEmailValid,
+          profileImage: profileImage,
+        ));
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("profile_image_selected".tr(context)),
+              backgroundColor: AppColors.orange,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("failed_to_pick_image".tr(context)),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      PrintUtil.error("Error picking image: $e");
+    }
+  }
+
+  /// Clear selected profile image
+  void clearProfileImage() {
+    profileImage = null;
+    emit(ProfileLoaded(
+      isPasswordVisible: isPasswordVisible,
+      isEmailValid: isEmailValid,
+      profileImage: profileImage,
+    ));
   }
 
   void showDeleteConfirmation(BuildContext context) {
@@ -156,5 +290,54 @@ class ProfileCubit extends Cubit<ProfileState> {
         ],
       ),
     );
+  }
+
+  Future<void> sendEmailVerificationOtp() async {
+    emit(EmailVerificationLoading());
+    try {
+      final result = await sl<ProfileRepo>()
+          .sendEmailVerificationOtp(email: emailController.text);
+
+      result.fold(
+        (error) {
+          PrintUtil.error("Failed to send OTP: $error");
+          emit(EmailVerificationError(error));
+        },
+        (response) {
+          PrintUtil.success("OTP sent successfully");
+          emit(EmailVerificationSuccess(response.message ?? ""));
+        },
+      );
+    } catch (e) {
+      PrintUtil.error("Error sending OTP: $e");
+      emit(EmailVerificationError("Failed to send OTP: $e"));
+    }
+  }
+
+  Future<void> verifyEmailOtp(String email, String code) async {
+    emit(OtpVerificationLoading()); // Specific state for OTP verification
+    try {
+      final result = await sl<ProfileRepo>().verifyEmailOtp(
+        email: email,
+        code: code,
+      );
+
+      result.fold(
+        (error) {
+          PrintUtil.error("OTP verification failed: $error");
+          emit(OtpVerificationError(error)); // Specific error state
+        },
+        (response) {
+          PrintUtil.success("Email verified successfully");
+
+          emit(OtpVerificationSuccess(response.message ?? ""));
+          final globalCubit = sl<GlobalCubit>();
+          globalCubit.refreshProfile();
+        },
+      );
+    } catch (e) {
+      PrintUtil.error("Error verifying OTP: $e");
+      emit(OtpVerificationError("Failed to verify OTP: $e"));
+    }
   }
 }

@@ -7,6 +7,13 @@ class ResponseModel {
   ResponseModel({this.success, this.message, this.data, this.token});
 
   factory ResponseModel.fromJson(Map<String, dynamic> json) {
+    final tokenFromData = json['data'] is Map<String, dynamic>
+        ? json['data']['token'] as String?
+        : null;
+
+    // Extract token from root level if it exists there
+    final tokenFromRoot = json['token'] as String?;
+
     return ResponseModel(
       success: json['success'] as bool?,
       message: json['message'] as String?,
@@ -16,7 +23,7 @@ class ResponseModel {
               ? json['data']['user'] as Map<String, dynamic>
               : json['data'] as Map<String, dynamic>)
           : null,
-      token: json['token'] as String?,
+      token: tokenFromData ?? tokenFromRoot,
     );
   }
 
@@ -43,21 +50,22 @@ class UserData {
   String? createdAt;
   String? updatedAt;
   String? deletedAt;
+  String? token;
 
-  UserData({
-    this.id,
-    this.username,
-    this.email,
-    this.phone,
-    this.countryCode,
-    this.emailVerifiedAt,
-    this.phoneVerifiedAt,
-    this.image,
-    this.notificationsEnabled,
-    this.createdAt,
-    this.updatedAt,
-    this.deletedAt,
-  });
+  UserData(
+      {this.id,
+      this.username,
+      this.email,
+      this.phone,
+      this.countryCode,
+      this.emailVerifiedAt,
+      this.phoneVerifiedAt,
+      this.image,
+      this.notificationsEnabled,
+      this.createdAt,
+      this.updatedAt,
+      this.deletedAt,
+      this.token});
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
@@ -73,6 +81,7 @@ class UserData {
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
       deletedAt: json['deleted_at'] as String?,
+      token: json['token'] as String?,
     );
   }
 
@@ -90,6 +99,7 @@ class UserData {
       'created_at': createdAt,
       'updated_at': updatedAt,
       'deleted_at': deletedAt,
+      'token': token,
     };
   }
 }

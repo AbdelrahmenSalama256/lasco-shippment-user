@@ -50,3 +50,13 @@ class ResendOtpCodeError extends LoginState {
   final String errorMessage;
   ResendOtpCodeError(this.errorMessage);
 }
+
+// Reset Password States
+class ResetPasswordLoading extends LoginState {}
+
+class ResetPasswordSuccess extends LoginState {}
+
+class ResetPasswordError extends LoginState {
+  final String errorMessage;
+  ResetPasswordError(this.errorMessage);
+}

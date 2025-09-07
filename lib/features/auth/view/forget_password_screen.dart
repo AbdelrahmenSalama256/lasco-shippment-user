@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lasco/core/component/custom_toast.dart';
 import 'package:lasco/core/component/widgets/app_button.dart';
 import 'package:lasco/core/constants/app_colors.dart';
-import 'package:lasco/core/constants/navigation.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
 import 'package:lasco/features/auth/view/cubit/login_cubit.dart';
 import 'package:lasco/features/auth/view/otp_verification_screen.dart';
@@ -27,16 +26,24 @@ class ForgotPasswordScreen extends StatelessWidget {
         child: BlocConsumer<LoginCubit, LoginState>(
           listener: (context, state) {
             if (state is ForgotPasswordSuccess) {
-              navigateTo(
-                  context,
-                  BlocProvider(
-                    create: (context) =>
-                        LoginCubit()..sendForgotPasswordOtp(context),
+              final phoneNumber =
+                  context.read<LoginCubit>().phoneController.text;
+
+              // Navigate to OTP verification screen with new cubit but same phone
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (context) => LoginCubit()
+                      ..phoneController.text = phoneNumber
+                      ..startResendTimer(),
                     child: OtpVerificationScreen(
-                      phoneNumber:
-                          context.read<LoginCubit>().phoneController.text,
+                      phoneNumber: phoneNumber,
+                      isResetPassword: true,
                     ),
-                  ));
+                  ),
+                ),
+              );
             } else if (state is ForgotPasswordError) {
               showToast(
                 context,
@@ -77,6 +84,7 @@ class ForgotPasswordScreen extends StatelessWidget {
 
                     // Phone Field
                     AppTextField(
+                      enabled: state is ForgotPasswordLoading ? false : true,
                       radius: BorderRadiusDirectional.circular(12.r),
                       controller: cubit.phoneController,
                       hintText: "enter_your_phone".tr(context),
@@ -93,14 +101,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                       backgroundColor: AppColors.orange,
                       isLoading: state is ForgotPasswordLoading,
                       onPressed: () {
-                        if (cubit.phoneController.text.isNotEmpty) {
+                        if (cubit.formKey.currentState!.validate()) {
                           cubit.sendForgotPasswordOtp(context);
-                        } else {
-                          showToast(
-                            context,
-                            message: "please_enter_your_phone".tr(context),
-                            state: ToastStates.error,
-                          );
                         }
                       },
                     ),

@@ -38,15 +38,57 @@ class LoginCubit extends Cubit<LoginState> {
     emit(LoginUpdated());
   }
 
-  void sendForgotPasswordOtp(BuildContext context) {
+  //! Forget Password - Send OTP
+  Future<void> sendForgotPasswordOtp(BuildContext context) async {
     if (!formKey.currentState!.validate()) return;
 
-    emit(LoginLoading());
+    emit(ForgotPasswordLoading());
 
-    startResendTimer();
-    Future.delayed(const Duration(seconds: 2), () {
-      emit(ForgotPasswordSuccess());
-    });
+    final result = await sl<LoginRepo>().sendForgotPasswordOtp(
+      phone: phoneController.text,
+    );
+
+    result.fold(
+      (error) => emit(ForgotPasswordError(error)),
+      (response) {
+        startResendTimer();
+        emit(ForgotPasswordSuccess());
+      },
+    );
+  }
+
+  //! Forget Password - Verify OTP
+  Future<void> verifyForgotPasswordOtp(String phoneNumber) async {
+    emit(OtpVerificationLoading());
+
+    final result = await sl<LoginRepo>().verifyForgotPasswordOtp(
+      phone: phoneNumber,
+      code: otpController.text,
+    );
+
+    result.fold(
+      (error) => emit(OtpVerificationError(error)),
+      (response) {
+        emit(OtpVerificationSuccess());
+      },
+    );
+  }
+
+  //! Forget Password - Reset Password
+  Future<void> resetPassword(String phonenumber) async {
+    emit(ResetPasswordLoading());
+
+    final result = await sl<LoginRepo>().resetPassword(
+        newPassword: passwordController.text,
+        confirmPassword: confirmPasswordController.text,
+        phone: phonenumber);
+
+    result.fold(
+      (error) => emit(ResetPasswordError(error)),
+      (response) {
+        emit(ResetPasswordSuccess());
+      },
+    );
   }
 
   void changePassword(BuildContext context) {
@@ -55,7 +97,6 @@ class LoginCubit extends Cubit<LoginState> {
     emit(OtpVerificationLoading());
     Future.delayed(const Duration(seconds: 2), () {
       if (passwordController.text == confirmPasswordController.text) {
-        // Example condition
         emit(OtpVerificationSuccess());
       } else {
         emit(OtpVerificationError("Passwords do not match"));
@@ -130,6 +171,7 @@ class LoginCubit extends Cubit<LoginState> {
       (response) {
         if (response.token != null && response.token!.isNotEmpty) {
           context.read<GlobalCubit>().updateToken(response.token!);
+          context.read<GlobalCubit>().getProfile();
           PrintUtil.debug("Token cached: ${response.token}");
         } else {
           PrintUtil.error("No token found in response");
@@ -138,5 +180,15 @@ class LoginCubit extends Cubit<LoginState> {
         emit(LoginSuccess(response));
       },
     );
+  }
+
+  @override
+  Future<void> close() {
+    _resendTimer?.cancel();
+    phoneController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    otpController.dispose();
+    return super.close();
   }
 }

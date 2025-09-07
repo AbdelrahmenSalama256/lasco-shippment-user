@@ -6,40 +6,29 @@ class EndPoints {
   //! Login
   static const String login = "${baseUrl}api/v1/auth/login";
   static const String getProfile = "${baseUrl}api/v1/user/me";
-  static const String updateProfile = "${baseUrl}profile-update";
+  static const String updateProfile = "${baseUrl}api/v1/user/update/profile";
 
   //! Register
   static const String register = "${baseUrl}api/v1/auth/register";
   static const String verify = "${baseUrl}api/v1/auth/verify-otp";
+  static const String verifyEmailOtp =
+      "${baseUrl}api/v1/auth/email-verification/verify-otp";
+  static const String sendEmailVerificationOtp =
+      "${baseUrl}api/v1/auth/email-verification/send-otp";
   static const String resendOtp = "${baseUrl}api/v1/auth/resend-otp";
   static const String forgotPassword = "${baseUrl}forget-password";
   //! Logout
   static const String userLogout = "${baseUrl}api/v1/auth/logout";
-  static const String deleteAccount = "${baseUrl}auth/account-deletion";
+  static const String deleteAccount = "${baseUrl}api/v1/user/delete-account";
   //! Forget Password
+  static const String resetPassword = "${baseUrl}api/v1/auth/reset-password";
+  static const String verifyForgotPasswordOtp =
+      "${baseUrl}api/v1/auth/forgot-password/verify-otp";
+  static const String sendOtpReset =
+      "${baseUrl}api/v1/auth/forgot-password/send-otp";
 
-  // ! Notifications
-  static const String notifications = '${baseUrl}notifications';
-
-  // ! shop
-  static const String category = '${baseUrl}categories';
-
-  // ! Wishlist
-  static const String favorites = '${baseUrl}favourite';
-  static const String addProductToWishlist = '${baseUrl}favourite/product';
-  static const String addAccountToWishlist = '${baseUrl}favourite/account';
-
-  // ! Cart
-  static const String cart = '${baseUrl}carts';
-  static const String addProductToCart = '${baseUrl}carts';
-  static const String updateCartItemQuantity = '${baseUrl}carts';
-  static const String removeCartItem = '${baseUrl}carts';
-  static const String cartInfo = '${baseUrl}cart-info';
-
-  //// Buissniss Account Case
-  //! Create Account
-  static const String createAccount = '${baseUrl}accounts';
-  static const String createAccountStepOne = '${baseUrl}accounts/step-one';
+  //! home
+  static const String shipmentCompanies = "${baseUrl}api/v1/shipment-companies";
 }
 
 class ApiKey {

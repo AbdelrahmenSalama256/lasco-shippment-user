@@ -1,15 +1,21 @@
+// lib/features/home/presentation/component/widgets/company_grid.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lasco/core/constants/navigation.dart';
-import 'package:lasco/features/company/views/company_details_screen.dart';
+import 'package:lasco/core/locale/app_loacl.dart';
 import 'package:lasco/features/company/views/shopping_companies_screen.dart';
 
+import '../../../../../core/constants/app_colors.dart';
+import '../../../../company/views/company_details_screen.dart';
+import '../../../data/model/company_model.dart';
 import 'company_card.dart';
 import 'section_header.dart';
 
 class CompanyGrid extends StatelessWidget {
   final String? title;
   final List<CompanyModel> companies;
+  final bool hasMore;
+  final VoidCallback? onLoadMore;
   final int crossAxisCount;
   final double childAspectRatio;
 
@@ -17,6 +23,8 @@ class CompanyGrid extends StatelessWidget {
     super.key,
     this.title,
     required this.companies,
+    this.hasMore = false,
+    this.onLoadMore,
     this.crossAxisCount = 2,
     this.childAspectRatio = 0.75,
   });
@@ -39,7 +47,7 @@ class CompanyGrid extends StatelessWidget {
         // Companies Grid
         GridView.builder(
           shrinkWrap: true,
-          physics: BouncingScrollPhysics(),
+          physics: NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             childAspectRatio: childAspectRatio,
@@ -51,31 +59,37 @@ class CompanyGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             final company = companies[index];
             return CompanyCard(
-              companyName: company.name,
-              description: company.description,
-              imageUrl: company.imageUrl,
+              companyName: company.name ?? "",
+              description: company.description ?? "",
+              imageUrl: company.logo,
+              isFav: company.isActive ?? false,
+              rate: company.averageRating.toString(),
               onViewPressed: () {
-                navigateTo(context, CompanyDetailsScreen());
+                navigateTo(
+                  context,
+                  CompanyDetailsScreen(id: company.id ?? 0),
+                );
               },
             );
           },
         ),
+
+        // Load More Button
+        if (hasMore && onLoadMore != null)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: ElevatedButton(
+                onPressed: onLoadMore,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.orange,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text('load_more'.tr(context)),
+              ),
+            ),
+          ),
       ],
     );
   }
-}
-
-// Company Model
-class CompanyModel {
-  final String id;
-  final String name;
-  final String description;
-  final String? imageUrl;
-
-  CompanyModel({
-    required this.id,
-    required this.name,
-    required this.description,
-    this.imageUrl,
-  });
 }

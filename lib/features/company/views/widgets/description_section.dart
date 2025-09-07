@@ -5,11 +5,13 @@ import 'package:lasco/core/locale/app_loacl.dart';
 
 class DescriptionSection extends StatelessWidget {
   final bool isExpanded;
+  final String? description;
   final VoidCallback onToggle;
 
   const DescriptionSection({
     super.key,
     required this.isExpanded,
+    this.description,
     required this.onToggle,
   });
 
@@ -38,7 +40,7 @@ class DescriptionSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Text(
-              'The Strawberry & Cream Ultra Rich Body Lotion has a long-lasting fragrance that is sweet and fruity, reminiscent of fresh ripe strawberries. This body lotion is enriched with Glycerin and Panthenol to lock in moisture and keep your skin smooth and supple for 24 hours.',
+              description ?? "",
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w400,

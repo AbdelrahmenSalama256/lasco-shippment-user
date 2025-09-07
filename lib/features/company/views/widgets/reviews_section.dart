@@ -7,7 +7,16 @@ import 'package:lasco/core/locale/app_loacl.dart';
 import 'review_item.dart';
 
 class ReviewsSection extends StatelessWidget {
-  const ReviewsSection({super.key});
+  final List<dynamic>? reviews;
+  final int? countReviews;
+  final double? averageRating;
+
+  const ReviewsSection({
+    super.key,
+    this.reviews,
+    this.countReviews,
+    this.averageRating,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +27,7 @@ class ReviewsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // العنوان
           Text(
             "reviews".tr(context),
             style: TextStyle(
@@ -27,6 +37,8 @@ class ReviewsSection extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10.h),
+
+          // البوكس اللي فيه التقييم العام وعدد الريفيوهات
           Container(
             height: 49.h,
             decoration: BoxDecoration(
@@ -39,15 +51,18 @@ class ReviewsSection extends StatelessWidget {
               children: [
                 Row(
                   children: List.generate(5, (index) {
+                    final rating = averageRating ?? 0.0;
                     return Icon(
                       CupertinoIcons.star_fill,
-                      color: const Color(0xffFFB543),
+                      color: index < rating.round()
+                          ? const Color(0xffFFB543)
+                          : Colors.grey.shade300,
                       size: 20.w,
                     );
                   }),
                 ),
                 Text(
-                  "reviews_count".tr(context),
+                  "${countReviews ?? 0} ${"reviews_count".tr(context)}",
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
@@ -58,21 +73,31 @@ class ReviewsSection extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16.h),
-          const ReviewItem(
-            image: "assets/images/png/user2.png",
-            name: "Jonas Sousa",
-            rating: "4.5",
-            review:
-                "This body lotion is enriched with Glycerin and Vitamin E to deeply moisturize and nourish your skin.",
-          ),
-          SizedBox(height: 12.h),
-          const ReviewItem(
-            image: "assets/images/png/user1.jpg",
-            name: "Jonas Sousa",
-            rating: "4.0",
-            review:
-                "This body lotion is enriched with Glycerin and Vitamin E to deeply moisturize and nourish your skin.",
-          ),
+
+          // لو في ريفيوهات
+          if (reviews != null && reviews!.isNotEmpty)
+            Column(
+              children: reviews!.map((review) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: ReviewItem(
+                    image:
+                        "assets/images/png/user1.jpg", // لو الـ API بيرجع صورة بدال static
+                    name: review['user']?['name'] ?? "Anonymous",
+                    rating: review['rating']?.toString() ?? "0.0",
+                    review: review['comment'] ?? "",
+                  ),
+                );
+              }).toList(),
+            )
+          else
+            Text(
+              "no_reviews".tr(context),
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: AppColors.grey,
+              ),
+            ),
         ],
       ),
     );

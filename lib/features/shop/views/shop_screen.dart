@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
 
 import '../../../core/component/widgets/app_text_field.dart';
+import '../../home/data/model/company_model.dart';
 import '../../home/view/component/widgets/company_grid.dart';
 import 'cubit/shop_cubit.dart';
 import 'cubit/shop_state.dart';
@@ -19,41 +20,11 @@ class ShopScreen extends StatelessWidget {
   List<CompanyModel> _getCompanies() {
     return [
       CompanyModel(
-        id: '1',
+        id: 1,
         name: 'WALAA INTERRA',
         description: 'Shipping and logistics company',
-        imageUrl: 'assets/images/png/com-2.png',
-      ),
-      CompanyModel(
-        id: '2',
-        name: 'LASCO Shipping',
-        description: 'International cargo services',
-        imageUrl: 'assets/images/png/com-1.png',
-      ),
-      CompanyModel(
-        id: '3',
-        name: 'Global Express',
-        description: 'Worldwide delivery services',
-        imageUrl: 'assets/images/png/company3.png',
-      ),
-      CompanyModel(
-        id: '4',
-        name: 'Fast Logistics',
-        description: 'Quick and reliable shipping',
-        imageUrl: 'assets/images/png/company4.png',
-      ),
-      CompanyModel(
-        id: '5',
-        name: 'Cargo Masters',
-        description: 'Professional cargo handling',
-        imageUrl: 'assets/images/png/company5.png',
-      ),
-      CompanyModel(
-        id: '6',
-        name: 'ShipEasy',
-        description: 'Simplified shipping solutions',
-        imageUrl: 'assets/images/png/company6.png',
-      ),
+        logo: 'assets/images/png/com-2.png',
+      )
     ];
   }
 

@@ -32,6 +32,7 @@ class DioConsumer extends ApiConsumer {
           return !args.isResponse || !args.hasUint8ListData;
         }));
   }
+
   @override
   Future delete(String path,
       {Object? data, Map<String, dynamic>? queryParameters}) async {
@@ -55,10 +56,17 @@ class DioConsumer extends ApiConsumer {
     bool isFormData = false,
   }) async {
     try {
+      // FIXED: Handle FormData properly
+      final Options options = Options();
+      if (isFormData) {
+        options.headers?.remove('Content-Type'); // Let Dio handle it
+      }
+
       var res = await dio.get(
         path,
-        data: isFormData ? FormData.fromMap(data) : data,
+        data: data, // Pass data directly
         queryParameters: queryParameters,
+        options: options,
       );
       return res;
     } on DioException catch (e) {
@@ -74,10 +82,17 @@ class DioConsumer extends ApiConsumer {
     bool isFormData = false,
   }) async {
     try {
+      // FIXED: Handle FormData properly
+      final Options options = Options();
+      if (isFormData) {
+        options.headers?.remove('Content-Type'); // Let Dio handle it
+      }
+
       var res = await dio.patch(
         path,
-        data: isFormData ? FormData.fromMap(data) : data,
+        data: data, // Pass data directly
         queryParameters: queryParameters,
+        options: options,
       );
       return res;
     } on DioException catch (e) {
@@ -93,10 +108,17 @@ class DioConsumer extends ApiConsumer {
     bool isFormData = false,
   }) async {
     try {
+      // FIXED: Handle FormData properly
+      final Options options = Options();
+      if (isFormData) {
+        options.headers?.remove('Content-Type'); // Let Dio handle it
+      }
+
       var res = await dio.put(
         path,
-        data: isFormData ? FormData.fromMap(data) : data,
+        data: data, // Pass data directly
         queryParameters: queryParameters,
+        options: options,
       );
       return res;
     } on DioException catch (e) {
@@ -112,10 +134,21 @@ class DioConsumer extends ApiConsumer {
     bool isFormData = false,
   }) async {
     try {
+      // FIXED: Handle FormData properly
+      final Options options = Options();
+      if (isFormData) {
+        options.headers?.remove('Content-Type'); // Let Dio handle it
+      } else {
+        // For non-FormData, ensure JSON content type
+        options.headers?['Content-Type'] = 'application/json';
+      }
+
       var res = await dio.post(
         path,
-        data: isFormData ? FormData.fromMap(data) : data,
+        data:
+            data, // Pass data directly - it's already FormData if isFormData=true
         queryParameters: queryParameters,
+        options: options,
       );
       return res;
     } on DioException catch (e) {

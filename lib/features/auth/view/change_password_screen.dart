@@ -9,7 +9,7 @@ import 'package:lasco/core/constants/navigation.dart';
 import 'package:lasco/core/locale/app_loacl.dart';
 import 'package:lasco/core/utils/password_strength_toggle.dart';
 import 'package:lasco/core/utils/validator.dart';
-import 'package:lasco/features/base/views/base_screen.dart';
+import 'package:lasco/features/auth/view/login_screen.dart';
 
 import '../../../core/component/widgets/app_text_field.dart';
 import '../../offers/views/widgets/custom_app_bar.dart';
@@ -17,7 +17,8 @@ import 'cubit/login_cubit.dart';
 import 'cubit/login_state.dart';
 
 class ChangePasswordScreen extends StatelessWidget {
-  const ChangePasswordScreen({super.key});
+  final String phonenumber;
+  const ChangePasswordScreen({super.key, required this.phonenumber});
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +29,14 @@ class ChangePasswordScreen extends StatelessWidget {
         create: (context) => LoginCubit(),
         child: BlocConsumer<LoginCubit, LoginState>(
           listener: (context, state) {
-            if (state is OtpVerificationSuccess) {
+            if (state is ResetPasswordSuccess) {
               showToast(
                 context,
                 message: 'password_changed_successfully'.tr(context),
                 state: ToastStates.success,
               );
-              navigateAndFinish(context, BaseScreen());
-            } else if (state is OtpVerificationError) {
+              navigateAndFinish(context, LoginScreen());
+            } else if (state is ResetPasswordError) {
               showToast(
                 context,
                 message: state.errorMessage,
@@ -75,7 +76,8 @@ class ChangePasswordScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 20.h),
                         PasswordFieldWithToggle(
-                          isEnabled: true,
+                          isEnabled:
+                              state is ResendOtpCodeLoading ? false : true,
                           isPasswordObscure: cubit.isPasswordObscure,
                           togglePasswordVisibility:
                               cubit.togglePasswordVisibility,
@@ -86,6 +88,7 @@ class ChangePasswordScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 25.h),
                         AppTextField(
+                          enabled: state is ResendOtpCodeLoading ? false : true,
                           controller: cubit.confirmPasswordController,
                           radius: BorderRadiusDirectional.circular(12.r),
                           hintText: "confirm_your_password".tr(context),
@@ -99,10 +102,10 @@ class ChangePasswordScreen extends StatelessWidget {
                         AppButton(
                           text: "save".tr(context),
                           backgroundColor: AppColors.orange,
-                          isLoading: state is OtpVerificationLoading,
+                          isLoading: state is ResetPasswordLoading,
                           onPressed: () {
                             if (cubit.formKey.currentState!.validate()) {
-                              cubit.changePassword(context);
+                              cubit.resetPassword(phonenumber);
                             } else {
                               showToast(
                                 context,
